@@ -13,7 +13,7 @@
 */
 
 #include "stdint.h"
-#include "board.h"
+#include "openwsn_board.h"
 
 //=========================== typedef =========================================
 
