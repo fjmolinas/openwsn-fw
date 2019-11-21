@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python2.7
 
 # Copyright (c) 2008 Johns Hopkins University.
 # All rights reserved.
