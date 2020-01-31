@@ -84,6 +84,8 @@ project:
     printf        Sends the string messages to openvisualizer  
                   0 (off ), 1 (on, default)
     ide           qtcreator
+    single_ch_slot Set single channel hopping for debugging
+                  0 (off, default), i (on, channel=i)
 
     Common variables:
     verbose        Print each complete compile/link command.
@@ -147,6 +149,7 @@ command_line_options = {
     'atmel_24ghz':              ['0','1'],
     'noadaptivesync':           ['0','1'],
     'l2_security':              ['0','1'],
+    'single_ch_slot':           ['0'],
     'msf_adapting_to_traffic':  ['0','1'],
     'printf':                   ['1','0'],          # 1=on (default),  0=off
     'deadline_option':          ['0','1'],
@@ -301,6 +304,13 @@ command_line_vars.AddVariables(
         '',                                                # help
         command_line_options['l2_security'][0],            # default
         validate_option,                                   # validator
+        int,                                               # converter
+    ),
+    (
+        'single_ch_slot',                                  # key
+        '',                                                # help
+        command_line_options['single_ch_slot'][0],         # default
+        None,                                              # validator
         int,                                               # converter
     ),
     (

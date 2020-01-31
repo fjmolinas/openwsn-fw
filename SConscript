@@ -48,6 +48,8 @@ if env['noadaptivesync']==1:
     env.Append(CPPDEFINES    = 'NOADAPTIVESYNC')
 if env['l2_security']==1:
     env.Append(CPPDEFINES    = 'L2_SECURITY_ACTIVE')
+if env['single_ch_slot']!=0:
+    env.Append(CPPDEFINES    = {'SINGLE_CHANNEL_SLOT' : env['single_ch_slot']})
 if env['msf_adapting_to_traffic']==1:
     env.Append(CPPDEFINES    = 'MSF_ADAPTING_TO_TRAFFIC')
 if env['printf']==1:
