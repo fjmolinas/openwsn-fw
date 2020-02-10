@@ -20,7 +20,7 @@
 #include "openbridge.h"
 #include "leds.h"
 #include "schedule.h"
-#include "uart.h"
+#include "openwsn_uart.h"
 #include "opentimers.h"
 #include "openhdlc.h"
 #include "schedule.h"
