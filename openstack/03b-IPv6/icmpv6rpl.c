@@ -14,6 +14,8 @@
 #include "schedule.h"
 #include "msf.h"
 
+#include "openwsn_log.h"
+
 //=========================== definition ======================================
 
 #define DIO_PORTION 10
@@ -453,6 +455,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection(void) {
     }
 
     if (foundBetterParent) {
+        LOG_RIOT_DEBUG("[icmpv6rpl]: found better parent\n");
         icmpv6rpl_vars.haveParent = TRUE;
         if (!prevHadParent) {
             // in case preParent is killed before calling this function, clear the preferredParent flag
@@ -628,6 +631,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t *msg) {
 }
 
 void icmpv6rpl_killPreferredParent(void) {
+    LOG_RIOT_DEBUG("[icmpv6rpl]: kill preferred parent\n");
     icmpv6rpl_vars.haveParent = FALSE;
     if (idmanager_getIsDAGroot() == TRUE) {
         icmpv6rpl_vars.myDAGrank = MINHOPRANKINCREASE;
