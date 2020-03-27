@@ -19,6 +19,8 @@
 #include "openrandom.h"
 #include "msf.h"
 
+#include "openwsn_log.h"
+
 //=========================== definition ======================================
 
 //=========================== variables =======================================
@@ -843,6 +845,7 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
         synchronizePacket(ieee154e_vars.syncCapturedTime);
 
         // declare synchronized
+        LOG_RIOT_DEBUG("[IEE20154E]: synchronized\n");
         changeIsSync(TRUE);
         // log the info
         LOG_SUCCESS(COMPONENT_IEEE802154E, ERR_SYNCHRONIZED,
@@ -924,6 +927,7 @@ port_INLINE void activity_ti1ORri1(void) {
             ieee154e_vars.numOfSleepSlots = 1;
 
             // declare myself desynchronized
+            LOG_RIOT_DEBUG("[IEE20154E]: desynchronized\n");
             changeIsSync(FALSE);
 
             // log the error

@@ -8,6 +8,8 @@
 #include "openrandom.h"
 #include "msf.h"
 
+#include "openwsn_log.h"
+
 //=========================== variables =======================================
 
 neighbors_vars_t neighbors_vars;
@@ -678,6 +680,7 @@ void registerNewNeighbor(open_addr_t *address,
         i = 0;
         while (i < MAXNUMNEIGHBORS) {
             if (neighbors_vars.neighbors[i].used == FALSE) {
+                LOG_RIOT_DEBUG("[neighbors]: new neighbor rssi: %d\n", rssi);
                 if (rssi < GOODNEIGHBORMINRSSI) {
                     break;
                 }
@@ -728,7 +731,7 @@ bool isNeighbor(open_addr_t *neighbor) {
 }
 
 void removeNeighbor(uint8_t neighborIndex) {
-
+    LOG_RIOT_DEBUG("[neighbors]: remove beighbour %d\n", neighborIndex);
     neighbors_vars.neighbors[neighborIndex].used = FALSE;
     neighbors_vars.neighbors[neighborIndex].parentPreference = 0;
     neighbors_vars.neighbors[neighborIndex].stableNeighbor = FALSE;
