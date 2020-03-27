@@ -10,7 +10,7 @@
 
 //=========================== variables =======================================
 
-static neighbors_vars_t neighbors_vars;
+neighbors_vars_t neighbors_vars;
 
 //=========================== prototypes ======================================
 
