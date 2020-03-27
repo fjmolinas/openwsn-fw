@@ -13,6 +13,8 @@
 #include "openwsn.h"
 #include "thread.h"
 
+#include "openwsn_log.h"
+
 #define OPENWSN_SCHEDULER_FLAG    (1u << 8)
 
 //=========================== variables =======================================
@@ -94,7 +96,7 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
     }
     if (taskContainer>&scheduler_vars.taskBuf[TASK_LIST_DEPTH-1]) {
        // task list has overflown. This should never happpen!
-
+       LOG_RIOT_ERROR("[openos/scheduler]: critical, task list overflow\n");
        // we can not print from within the kernel. Instead:
        // blink the error LED
        leds_error_blink();

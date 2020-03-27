@@ -22,6 +22,8 @@
 #include "eui64.h"
 #include "neighbors.h"
 
+#include "openwsn_log.h"
+
 //=========================== defines =========================================
 
 /// inter-packet period (in ms)
@@ -142,15 +144,19 @@ owerror_t cjoin_receive(OpenQueueEntry_t *msg,
     owerror_t ret;
 
     if (coap_header->Code != COAP_CODE_RESP_CHANGED) {
+        LOG_RIOT_DEBUG("[cjoin]:fail, replay protection\n");
         return E_FAIL;
     }
 
     ret = cojp_cbor_decode_configuration_object(msg->payload, msg->length, &configuration);
-    if (ret == E_FAIL) { return E_FAIL; }
+    if (ret == E_FAIL) {
+        LOG_RIOT_DEBUG("[cjoin]: decode fail\n");
+        return E_FAIL; }
 
     if (configuration.keyset.num_keys == 1 &&
         configuration.keyset.key[0].key_usage == COJP_KEY_USAGE_6TiSCH_K1K2_ENC_MIC32) {
         // set the L2 keys as per the parsed value
+        LOG_RIOT_DEBUG("[cjoin]: success\n");
         IEEE802154_security_setBeaconKey(configuration.keyset.key[0].key_index, configuration.keyset.key[0].key_value);
         IEEE802154_security_setDataKey(configuration.keyset.key[0].key_index, configuration.keyset.key[0].key_value);
         cjoin_setIsJoined(TRUE); // declare join is over
@@ -160,6 +166,7 @@ owerror_t cjoin_receive(OpenQueueEntry_t *msg,
         // TODO not supported for now
     }
 
+    LOG_RIOT_DEBUG("[cjoin]: failed\n");
     return E_FAIL;
 }
 
@@ -307,6 +314,7 @@ owerror_t cjoin_sendJoinRequest(open_addr_t *joinProxy) {
     // send
 
     LOG_INFO(COMPONENT_CJOIN, ERR_JOIN_REQUEST, (errorparameter_t) 0, (errorparameter_t) 0);
+    LOG_RIOT_DEBUG("[cjoin]: send join request\n");
 
     outcome = coap_send(
             pkt,
