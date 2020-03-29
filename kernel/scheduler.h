@@ -64,7 +64,7 @@ typedef struct {
 //=========================== prototypes ======================================
 
 void scheduler_init(void);
-void scheduler_start(void);
+void scheduler_start(unsigned state);
 void scheduler_push_task(task_cbt task_cb, task_prio_t prio);
 
 /**
