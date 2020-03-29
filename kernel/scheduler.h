@@ -47,7 +47,7 @@ typedef void (*task_cbt)(void);
 //=========================== prototypes ======================================
 
 void scheduler_init(void);
-void scheduler_start(void);
+void scheduler_start(unsigned state);
 void scheduler_push_task(task_cbt task_cb, task_prio_t prio);
 
 #if SCHEDULER_DEBUG_ENABLE
@@ -55,7 +55,7 @@ uint8_t scheduler_debug_get_TasksCur(void);
 uint8_t scheduler_debug_get_TasksMax(void);
 #endif
 
-#include "openos/scheduler_types.h"
+#include "scheduler_types.h"
 
 /**
 \}
