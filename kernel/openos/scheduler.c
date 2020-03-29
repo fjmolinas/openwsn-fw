@@ -10,6 +10,11 @@
 #include "debugpins.h"
 #include "leds.h"
 
+#include "openwsn.h"
+#include "thread.h"
+
+#define OPENWSN_SCHEDULER_FLAG    (1u << 8)
+
 //=========================== variables =======================================
 
 scheduler_vars_t scheduler_vars;
@@ -31,8 +36,11 @@ void scheduler_init(void) {
     SCHEDULER_ENABLE_INTERRUPT();
 }
 
-void scheduler_start(void) {
+void scheduler_start(unsigned state) {
     taskList_item_t* pThisTask;
+
+   irq_restore(state);
+
     while (1) {
         while(scheduler_vars.task_list!=NULL) {
          // there is still at least one task in the linked-list of tasks
@@ -59,6 +67,7 @@ void scheduler_start(void) {
       }
       debugpins_task_clr();
       board_sleep();
+      thread_flags_wait_any(OPENWSN_SCHEDULER_FLAG);
       debugpins_task_set();                      // IAR should halt here if nothing to do
    }
 }
@@ -105,6 +114,8 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
     }
 
     ENABLE_INTERRUPTS();
+   thread_t *thread = (thread_t*) thread_get(openwsn_get_pid());
+   thread_flags_set(thread, OPENWSN_SCHEDULER_FLAG);
 }
 
 //=========================== private =========================================
