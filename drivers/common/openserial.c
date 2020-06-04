@@ -748,9 +748,13 @@ port_INLINE void inputHdlcClose(void) {
         openserial_vars.inputBufFillLevel -= 2;
     } else {
         // the CRC is incorrect
-
+#ifdef OPENSERIAL_ECHO_BADCRC
+        // Force echo on invalid crc
+        openserial_vars.inputBuf[0] = SERFRAME_PC2MOTE_TRIGGERSERIALECHO;
+#else
         // drop the incoming frame
         openserial_vars.inputBufFillLevel = 0;
+#endif
     }
 }
 
