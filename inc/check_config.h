@@ -87,7 +87,7 @@
 
 #if !defined(OPENWSN_UDP_C) && (\
     defined(OPENWSN_USERIALBRIDGE_C) || \
-    defined(OPENWN_UECHO_C) || \
+    defined(OPENWSN_UECHO_C) || \
     defined(OPENWSN_UINJECT_C) || \
     defined(OPENWSN_USERIALBRIDGE_C) || \
     defined(OPENWSN_UEXPIRATION_C) || \
