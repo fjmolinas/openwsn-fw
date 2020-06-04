@@ -5,6 +5,7 @@ Import('env')
 localEnv = env.Clone()
 
 sources_h = [
+    'errno.h',
     'config.h',
     'check_config.h',
     'opendefs.h',
