@@ -85,7 +85,6 @@ void coap_init(void) {
     coap_vars.desc.port = WKP_UDP_COAP;
     coap_vars.desc.callbackReceive = &coap_receive;
     coap_vars.desc.callbackSendDone = coap_sendDone;
-    openudp_register(&coap_vars.desc);
 }
 
 /**
@@ -514,9 +513,6 @@ void coap_receive(OpenQueueEntry_t *msg) {
                        coap_header.messageID,
                        &coap_header.token[0]);
 
-    if ((openudp_send(msg)) == E_FAIL) {
-        openqueue_freePacketBuffer(msg);
-    }
 }
 
 /**
@@ -744,7 +740,6 @@ owerror_t coap_send(
     // pre-pend CoAP header (version,type,TKL,code,messageID,Token)
     coap_header_encode(msg, COAP_VERSION, type, request->TKL, code, request->messageID, request->token);
 
-    return openudp_send(msg);
 }
 
 /**
@@ -1217,9 +1212,6 @@ void coap_forward_message(OpenQueueEntry_t *msg,
                        header->messageID,
                        header->token);
 
-    if ((openudp_send(outgoingPacket)) == E_FAIL) {
-        openqueue_freePacketBuffer(outgoingPacket);
-    }
 }
 
 #endif /* OPENWSN_COAP_C */
