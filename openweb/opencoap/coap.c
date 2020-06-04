@@ -85,7 +85,6 @@ void coap_init(void) {
     coap_vars.desc.port = WKP_UDP_COAP;
     coap_vars.desc.callbackReceive = coap_receive;
     coap_vars.desc.callbackSendDone = coap_sendDone;
-    openudp_register(&coap_vars.desc);
 }
 
 /**
@@ -514,9 +513,6 @@ void coap_receive(OpenQueueEntry_t *msg) {
         return;
     }
 
-    if ((openudp_send(msg)) == E_FAIL) {
-        openqueue_freePacketBuffer(msg);
-    }
 }
 
 /**
@@ -766,7 +762,6 @@ owerror_t coap_send(
         return E_FAIL;
     }
 
-    return openudp_send(msg);
 }
 
 /**
@@ -1233,41 +1228,24 @@ void coap_forward_message(OpenQueueEntry_t *msg,
 
     // fill payload
     if (msg->length) {
-        if (packetfunctions_reserveHeader(&outgoingPacket, msg->length) == E_FAIL) {
-            goto fail;
-        }
+        packetfunctions_reserveHeader(&outgoingPacket, msg->length);
         memcpy(outgoingPacket->payload, msg->payload, msg->length);
-        if (packetfunctions_reserveHeader(&outgoingPacket, 1) == E_FAIL) {
-            goto fail;
-        }
+        packetfunctions_reserveHeader(&outgoingPacket, 1);
         outgoingPacket->payload[0] = COAP_PAYLOAD_MARKER;
     }
 
     // encode options
-    if (coap_options_encode(outgoingPacket, outgoingOptions, outgoingOptionsLen, COAP_OPTION_CLASS_ALL) == E_FAIL) {
-        goto fail;
-    }
+    coap_options_encode(outgoingPacket, outgoingOptions, outgoingOptionsLen, COAP_OPTION_CLASS_ALL);
 
     // encode CoAP header
-    if (coap_header_encode(outgoingPacket,
-                           header->Ver,
-                           header->T,
-                           header->TKL,
-                           header->Code,
-                           header->messageID,
-                           header->token) == E_FAIL) {
-        goto fail;
-    }
+    coap_header_encode(outgoingPacket,
+                       header->Ver,
+                       header->T,
+                       header->TKL,
+                       header->Code,
+                       header->messageID,
+                       header->token);
 
-    if ((openudp_send(outgoingPacket)) == E_FAIL) {
-        goto fail;
-    }
-
-    return;
-
-    fail:
-    openqueue_freePacketBuffer(outgoingPacket);
-    return;
 }
 
 #endif /* OPENWSN_COAP_C */
