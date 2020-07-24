@@ -17,7 +17,7 @@
     !defined(IOTLAB_A8_M3) && \
     !defined(SAMR21_XPRO) && \
     !defined(NRF52840)
-#error 'Board name must be specified to check for configuration errors'
+// #error 'Board name must be specified to check for configuration errors'
 #endif
 
 #if (defined(OPENMOTE_CC2538) || \
