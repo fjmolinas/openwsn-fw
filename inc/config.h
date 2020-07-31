@@ -341,13 +341,13 @@
 #endif
 
 /**
- * \def DAGROOT
+ * \def ROLE_DEFAULT
  *
- * Set this mote as the DODAG root.
+ * Includes the sensor driver
  *
  */
-#ifndef DAGROOT
-#define DAGROOT (0)
+#ifndef ROLE_DEFAULT
+#define ROLE_DEFAULT                    1   /* ROLE_COORDINATOR*/
 #endif
 
 /**

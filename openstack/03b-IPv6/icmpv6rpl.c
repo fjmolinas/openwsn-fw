@@ -59,7 +59,7 @@ void icmpv6rpl_init(void) {
     icmpv6rpl_vars.haveParent = FALSE;
     icmpv6rpl_vars.daoSent = FALSE;
 
-    if (idmanager_getIsDAGroot() == TRUE) {
+    if (idmanager_isPanCoordinator() == TRUE) {
         icmpv6rpl_vars.myDAGrank = MINHOPRANKINCREASE;
         icmpv6rpl_vars.lowestRankInHistory = MINHOPRANKINCREASE;
     } else {
@@ -105,7 +105,7 @@ void icmpv6rpl_init(void) {
     icmpv6rpl_vars.pio.vlifetime = 0xFFFFFFFF;
     // if not dagroot then do not initialize, will receive PIO and update fields
     // later
-    if (idmanager_getIsDAGroot()) {
+    if (idmanager_isPanCoordinator()) {
         memcpy(
                 &(icmpv6rpl_vars.pio.prefix[0]),
                 idmanager_getMyID(ADDR_PREFIX)->prefix,
@@ -260,7 +260,7 @@ void icmpv6rpl_receive(OpenQueueEntry_t *msg) {
             icmpv6rpl_timer_DIO_task();
             break;
         case IANA_ICMPv6_RPL_DIO:
-            if (idmanager_getIsDAGroot() == TRUE) {
+            if (idmanager_isPanCoordinator() == TRUE) {
                 // stop here if I'm in the DAG root
                 break; // break, don't return
             }
@@ -368,7 +368,7 @@ void icmpv6rpl_updateMyDAGrankAndParentSelection(void) {
     open_addr_t newParent;
 
     // if I'm a DAGroot, my DAGrank is always MINHOPRANKINCREASE
-    if ((idmanager_getIsDAGroot()) == TRUE) {
+    if ((idmanager_isPanCoordinator()) == TRUE) {
         // the dagrank is not set through setting command, set
         // test for change so as not to report unchanged value when root rank to MINHOPRANKINCREASE here
         if (icmpv6rpl_vars.myDAGrank != MINHOPRANKINCREASE) {
@@ -629,7 +629,7 @@ void icmpv6rpl_indicateRxDIO(OpenQueueEntry_t *msg) {
 
 void icmpv6rpl_killPreferredParent(void) {
     icmpv6rpl_vars.haveParent = FALSE;
-    if (idmanager_getIsDAGroot() == TRUE) {
+    if (idmanager_isPanCoordinator() == TRUE) {
         icmpv6rpl_vars.myDAGrank = MINHOPRANKINCREASE;
     } else {
         icmpv6rpl_vars.myDAGrank = DEFAULTDAGRANK;
@@ -691,8 +691,13 @@ void sendDIO(void) {
         return;
     }
 
+    // leafnodes should not send DIO
+    if (idmanager_isLeafNode()) {
+        return;
+    }
+
     if (
-            idmanager_getIsDAGroot() == FALSE &&
+            idmanager_isCoordinator() &&
             (
                     icmpv6rpl_getPreferredParentEui64(&addressToWrite) == FALSE ||
                     (
@@ -856,7 +861,7 @@ void sendDAO(void) {
     }
 
     // dont' send a DAO if you're the DAG root
-    if (idmanager_getIsDAGroot() == TRUE) {
+    if (idmanager_isPanCoordinator() == TRUE) {
         return;
     }
 
@@ -1040,7 +1045,7 @@ void sendDAO(void) {
 }
 
 bool icmpv6rpl_daoSent(void) {
-    if (idmanager_getIsDAGroot() == TRUE) {
+    if (idmanager_isPanCoordinator() == TRUE) {
         return TRUE;
     }
     return icmpv6rpl_vars.daoSent;

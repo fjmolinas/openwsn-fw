@@ -22,11 +22,10 @@ void idmanager_init(void) {
     // this is used to not wakeup in non-activeslot
     idmanager_vars.slotSkip = FALSE;
 
-    // isDAGroot
-#if DAGROOT
-    idmanager_vars.isDAGroot = TRUE;
+#if ROLE_DEFAULT == ROLE_PAN_COORDINATOR
+    idmanager_vars.role      = ROLE_PAN_COORDINATOR;
 #else
-    idmanager_vars.isDAGroot = FALSE;
+    idmanager_vars.role      = ROLE_COORDINATOR;
 #endif
 
     // myPANID
@@ -36,7 +35,7 @@ void idmanager_init(void) {
 
     // myPrefix
     idmanager_vars.myPrefix.type = ADDR_PREFIX;
-#if DAGROOT
+#if ROLE_DEFAULT == ROLE_PAN_COORDINATOR
     idmanager_vars.myPrefix.prefix[0]  = 0xbb;
     idmanager_vars.myPrefix.prefix[1]  = 0xbb;
     idmanager_vars.myPrefix.prefix[2]  = 0x00;
@@ -65,23 +64,35 @@ void idmanager_init(void) {
     packetfunctions_mac64bToMac16b(&idmanager_vars.my64bID, &idmanager_vars.my16bID);
 }
 
-bool idmanager_getIsDAGroot(void) {
-    bool res;
-    INTERRUPT_DECLARATION();
-
-    DISABLE_INTERRUPTS();
-    res = idmanager_vars.isDAGroot;
-    ENABLE_INTERRUPTS();
-    return res;
+bool idmanager_isCoordinator(void)
+{
+    return idmanager_vars.role == ROLE_PAN_COORDINATOR ||
+        idmanager_vars.role == ROLE_COORDINATOR;
 }
 
-void idmanager_setIsDAGroot(bool newRole) {
+bool idmanager_isPanCoordinator(void)
+{
+    return idmanager_vars.role == ROLE_PAN_COORDINATOR;
+}
+
+bool idmanager_isLeafNode(void)
+{
+    return idmanager_vars.role == ROLE_LEAF;
+}
+
+owerror_t idmanager_setRole(pan_role_t role)
+{
     INTERRUPT_DECLARATION();
     DISABLE_INTERRUPTS();
-    idmanager_vars.isDAGroot = newRole;
-    icmpv6rpl_updateMyDAGrankAndParentSelection();
-    schedule_startDAGroot();
-    ENABLE_INTERRUPTS();
+    idmanager_vars.role = role;
+    idmanager_vars.slotSkip = TRUE;
+   if (role == ROLE_PAN_COORDINATOR) {
+        idmanager_vars.slotSkip = FALSE;
+        icmpv6rpl_updateMyDAGrankAndParentSelection();
+        schedule_startPanCoordinator();
+   }
+   ENABLE_INTERRUPTS();
+   return E_SUCCESS;
 }
 
 bool idmanager_getIsSlotSkip(void) {
@@ -210,21 +221,20 @@ void idmanager_triggerAboutRoot(void) {
 
     // take action (byte 0)
     switch (input_buffer[0]) {
-        case ACTION_YES:
-            idmanager_setIsDAGroot(TRUE);
-            idmanager_vars.slotSkip = FALSE;
+        case ACTION_SET_PAN_COORDINATOR:
+            idmanager_setRole(ROLE_PAN_COORDINATOR);
             break;
-        case ACTION_NO:
-            idmanager_setIsDAGroot(FALSE);
-            idmanager_vars.slotSkip = TRUE;
+        case ACTION_SET_COORDINATOR:
+            idmanager_setRole(ROLE_COORDINATOR);
+            break;
+        case ACTION_SET_LEAF:
+            idmanager_setRole(ROLE_LEAF);
             break;
         case ACTION_TOGGLE:
-            if (idmanager_getIsDAGroot()) {
-                idmanager_setIsDAGroot(FALSE);
-                idmanager_vars.slotSkip = TRUE;
+            if (idmanager_isPanCoordinator()) {
+                idmanager_setRole(ROLE_COORDINATOR);
             } else {
-                idmanager_setIsDAGroot(TRUE);
-                idmanager_vars.slotSkip = FALSE;
+                idmanager_setRole(ROLE_PAN_COORDINATOR);
             }
             break;
         default:
@@ -274,7 +284,7 @@ status information about several modules in the OpenWSN stack.
 bool debugPrint_id(void) {
     debugIDManagerEntry_t output;
 
-    output.isDAGroot = idmanager_vars.isDAGroot;
+    output.isPanCoordinator = idmanager_vars.role == ROLE_PAN_COORDINATOR ? TRUE : FALSE;
     memcpy(output.myPANID, idmanager_vars.myPANID.panid, 2);
     memcpy(output.my16bID, idmanager_vars.my16bID.addr_16b, 2);
     memcpy(output.my64bID, idmanager_vars.my64bID.addr_64b, 8);
