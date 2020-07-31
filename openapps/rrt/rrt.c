@@ -54,7 +54,7 @@ void rrt_sendCoAPMsg(char actionMsg, uint8_t *ipv6mote);
 void rrt_init(void) {
 
     // do not run if DAGroot
-    if (idmanager_getIsDAGroot() == TRUE) return;
+    if (idmanager_isPanCoordinator() == TRUE) return;
 
     // prepare the resource descriptor for the /rt path
     rrt_vars.desc.path0len = sizeof(rrt_path0) - 1;

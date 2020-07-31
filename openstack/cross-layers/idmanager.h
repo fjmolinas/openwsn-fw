@@ -22,10 +22,16 @@ static const uint8_t linklocalprefix[] = {
 
 //=========================== typedef =========================================
 
+typedef enum {
+    ROLE_PAN_COORDINATOR=0,
+    ROLE_COORDINATOR,
+    ROLE_LEAF
+} pan_role_t;
+
 BEGIN_PACK
 
 typedef struct {
-    bool isDAGroot;
+    pan_role_t role;
     uint8_t myPANID[2];
     uint8_t my16bID[2];
     uint8_t my64bID[8];
@@ -37,7 +43,6 @@ END_PACK
 //=========================== module variables ================================
 
 typedef struct {
-    bool isDAGroot;
     open_addr_t myPANID;
     open_addr_t my16bID;
     open_addr_t my64bID;
@@ -45,15 +50,18 @@ typedef struct {
     bool slotSkip;
     uint8_t joinKey[16];
     asn_t joinAsn;
+    pan_role_t role;
 } idmanager_vars_t;
 
 //=========================== prototypes ======================================
 
 void idmanager_init(void);
 
-bool idmanager_getIsDAGroot(void);
+bool idmanager_isCoordinator(void);
 
-void idmanager_setIsDAGroot(bool newRole);
+bool idmanager_isPanCoordinator(void);
+
+owerror_t idmanager_setRole(pan_role_t newRole);
 
 bool idmanager_getIsSlotSkip(void);
 

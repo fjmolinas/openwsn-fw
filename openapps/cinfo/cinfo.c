@@ -45,7 +45,7 @@ void cinfo_sendDone(
 */
 void cinfo_init(void) {
     // do not run if DAGroot
-    if (idmanager_getIsDAGroot() == TRUE) return;
+    if (idmanager_isPanCoordinator() == TRUE) return;
 
     // prepare the resource descriptor for the /i path
     cinfo_vars.desc.path0len = sizeof(cinfo_path0) - 1;

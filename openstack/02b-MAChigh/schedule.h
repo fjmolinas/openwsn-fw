@@ -185,7 +185,7 @@ typedef struct {
 // admin
 void schedule_init(void);
 
-void schedule_startDAGroot(void);
+void schedule_startPanCoordinator(void);
 
 bool debugPrint_schedule(void);
 
