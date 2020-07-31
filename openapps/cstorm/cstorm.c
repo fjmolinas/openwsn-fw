@@ -175,7 +175,7 @@ void cstorm_task_cb(void) {
     }
 
     // don't run on dagroot
-    if (idmanager_getIsDAGroot()) {
+    if (idmanager_isPanCoordinator()) {
         opentimers_destroy(cstorm_vars.timerId);
         return;
     }

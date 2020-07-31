@@ -111,7 +111,7 @@ void cexample_task_cb(void) {
     }
 
     // don't run on dagroot
-    if (idmanager_getIsDAGroot()) {
+    if (idmanager_isPanCoordinator()) {
         opentimers_destroy(cexample_vars.timerId);
         return;
     }

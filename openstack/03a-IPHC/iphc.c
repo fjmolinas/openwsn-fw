@@ -73,7 +73,7 @@ owerror_t iphc_sendFromForwarding(
     msg->owner = COMPONENT_IPHC;
 
     // error checking
-    if (idmanager_getIsDAGroot() == TRUE &&
+    if (idmanager_isPanCoordinator() == TRUE &&
         packetfunctions_isAllRoutersMulticast(&(msg->l3_destinationAdd)) == FALSE) {
         LOG_CRITICAL(COMPONENT_IPHC, ERR_BRIDGE_MISMATCH, (errorparameter_t) 0, (errorparameter_t) 0);
         return E_FAIL;
@@ -232,7 +232,7 @@ owerror_t iphc_sendFromForwarding(
 owerror_t iphc_sendFromBridge(OpenQueueEntry_t *msg) {
     msg->owner = COMPONENT_IPHC;
     // error checking
-    if (idmanager_getIsDAGroot() == FALSE) {
+    if (idmanager_isPanCoordinator() == FALSE) {
         LOG_CRITICAL(COMPONENT_IPHC, ERR_BRIDGE_MISMATCH, (errorparameter_t) 1, (errorparameter_t) 0);
         return E_FAIL;
     }
@@ -278,7 +278,7 @@ void iphc_receive(OpenQueueEntry_t *msg) {
     }
 
     // if the address is broadcast address, the ipv6 header is the inner header
-    if (idmanager_getIsDAGroot() == FALSE || packetfunctions_isBroadcastMulticast(&(ipv6_inner_header.dest))) {
+    if (idmanager_isPanCoordinator() == FALSE || packetfunctions_isBroadcastMulticast(&(ipv6_inner_header.dest))) {
         packetfunctions_tossHeader(&msg, page_length);
         if (ipv6_outer_header.next_header == IANA_IPv6HOPOPT && ipv6_outer_header.hopByhop_option != NULL) {
             // retrieve hop-by-hop header (includes RPL option)
