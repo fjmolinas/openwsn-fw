@@ -115,7 +115,7 @@ void scheduler_push_task(task_cbt cb, task_prio_t prio) {
         scheduler_dbg.numTasksMax   = scheduler_dbg.numTasksCur;
     }
 
-    ENABLE_INTERRUPTS();
+   ENABLE_INTERRUPTS();
    thread_t *thread = (thread_t*) thread_get(openwsn_get_pid());
    thread_flags_set(thread, OPENWSN_SCHEDULER_FLAG);
 }
