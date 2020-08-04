@@ -75,22 +75,26 @@ void openstack_init(void) {
     neighbors_init();
     msf_init();
     //-- 03a-IPHC
+#if defined(OPENWSN_IPHC_C)
     openbridge_init();
     iphc_init();
 
 #if defined(OPENWSN_6LO_FRAGMENTATION_C)
     frag_init();
 #endif
+#endif
 
     //-- 03b-IPv6
+#if defined(OPENWSN_IPV6_C)
     forwarding_init();
     icmpv6_init();
 
-#if defined(OPENWSN_ICMPV6_C)
+#if defined(OPENWSN_ICMPV6_ECHO_C)
     icmpv6echo_init();
 #endif
 
     icmpv6rpl_init();
+#endif
     //-- 04-TRAN
 
 #if defined(OPENWSN_UDP_C)
@@ -98,10 +102,14 @@ void openstack_init(void) {
 #endif
 
     //===== application-layer
+#if defined(OPENWSN_OPENWEB_C)
     openweb_init();
+#endif
 
     //===== applications
+#if defined(OPENWSN_OPENAPPS_C)
     openapps_init();
+#endif
 
     LOG_SUCCESS(COMPONENT_OPENWSN, ERR_BOOTED, (errorparameter_t) 0, (errorparameter_t) 0);
 }
