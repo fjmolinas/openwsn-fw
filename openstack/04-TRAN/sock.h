@@ -2,7 +2,19 @@
 #define OPENWSN_SOCK_H
 
 #include "opendefs.h"
-#include "sock_types.h"
+#include "async_types.h"
+
+/**
+ * @brief   A Common IP-based transport layer endpoint
+ */
+struct _sock_tl_ep {
+    int family;
+    union {
+        uint8_t ipv6[16];
+    } addr;
+    uint16_t netif;
+    uint16_t port;
+};
 
 /**
  *  @brief  Type for a UDP endpoint 
@@ -49,5 +61,6 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep);
  */
 int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len, uint32_t timeout, sock_udp_ep_t *remote);
 
+#include "sock_types.h"
 
 #endif /* OPENWSN_SOCK_H */

@@ -17,6 +17,8 @@
 #include "config.h"
 #include "toolchain_defs.h"
 #include "board_info.h"
+#include "af.h"
+
 
 //=========================== define ==========================================
 
@@ -54,11 +56,6 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 enum {
     E_SUCCESS = 0,
     E_FAIL = 1,
-};
-
-// address families
-enum {
-    AF_INET6 = 1,
 };
 
 // types of addresses
