@@ -3,7 +3,8 @@
 #if defined(OPENWSN_UDP_C)
 
 #include "opendefs.h"
-#include "sock.h"
+#include "net/sock/udp.h"
+// #include "sock.h"
 #include "errno.h"
 #include "packetfunctions.h"
 #include "openqueue.h"
