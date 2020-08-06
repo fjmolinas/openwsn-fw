@@ -79,6 +79,11 @@ bool idmanager_isPanCoordinator(void)
     return idmanager_vars.role == ROLE_PAN_COORDINATOR;
 }
 
+bool idmanager_isLeafNode(void)
+{
+    return idmanager_vars.role == ROLE_LEAF;
+}
+
 owerror_t idmanager_setRole(pan_role_t role)
 {
    INTERRUPT_DECLARATION();
@@ -221,19 +226,19 @@ void idmanager_triggerAboutRoot(void) {
     // take action (byte 0)
     switch (input_buffer[0]) {
         case ACTION_YES:
-            idmanagaer_setRole((ROLE_PAN_COORDINATOR);
+            idmanager_setRole(ROLE_PAN_COORDINATOR);
             idmanager_vars.slotSkip = FALSE;
             break;
         case ACTION_NO:
-            idmanagaer_setRole(ROLE_LEAF);
+            idmanager_setRole(ROLE_LEAF);
             idmanager_vars.slotSkip = TRUE;
             break;
         case ACTION_TOGGLE:
             if (idmanager_isPanCoordinator()) {
-                idmanagaer_setRole(ROLE_LEAF);
+                idmanager_setRole(ROLE_LEAF);
                 idmanager_vars.slotSkip = TRUE;
             } else {
-                idmanagaer_setRole((ROLE_PAN_COORDINATOR);
+                idmanager_setRole(ROLE_PAN_COORDINATOR);
                 idmanager_vars.slotSkip = FALSE;
             }
             break;
@@ -250,6 +255,7 @@ void idmanager_triggerAboutRoot(void) {
     // indicate DODAGid to RPL
     memcpy(&dodagid[0], idmanager_vars.myPrefix.prefix, 8);  // prefix
     memcpy(&dodagid[8], idmanager_vars.my64bID.addr_64b, 8); // eui64
+    
     icmpv6rpl_writeDODAGid(dodagid);
 
     // store L2 security key index and key value

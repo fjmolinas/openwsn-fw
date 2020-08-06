@@ -61,6 +61,8 @@ bool idmanager_isCoordinator(void);
 
 bool idmanager_isPanCoordinator(void);
 
+bool idmanager_isLeafNode(void);
+
 owerror_t idmanager_setRole(pan_role_t newRole);
 
 bool idmanager_getIsSlotSkip(void);

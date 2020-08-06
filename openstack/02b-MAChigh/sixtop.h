@@ -147,6 +147,10 @@ owerror_t sixtop_request(
 // from upper layer
 owerror_t sixtop_send(OpenQueueEntry_t *msg);
 
+// forward declaration
+void upper_sendDone(OpenQueueEntry_t *msg, owerror_t error);
+void upper_receive(OpenQueueEntry_t *msg);
+
 // from lower layer
 void task_sixtopNotifSendDone(void);
 

@@ -438,11 +438,7 @@ void task_sixtopNotifSendDone(void) {
             break;
         default:
             // send the rest up the stack
-#if defined(OPENWSN_6LO_FRAGMENTATION_C)
-            frag_sendDone(msg, msg->l2_sendDoneError);
-#else
-            iphc_sendDone(msg, msg->l2_sendDoneError);
-#endif
+            upper_sendDone(msg, msg->l2_sendDoneError);
             break;
     }
 }
@@ -502,11 +498,7 @@ void task_sixtopNotifReceive(void) {
                     break;
                 }
                 // send to upper layer
-#if defined(OPENWSN_6LO_FRAGMENTATION_C)
-                frag_receive(msg);
-#else
-                iphc_receive(msg);
-#endif
+                upper_receive(msg);
             } else {
                 // free up the RAM
                 openqueue_freePacketBuffer(msg);
@@ -651,7 +643,8 @@ void sixtop_maintenance_timer_cb(opentimers_id_t id) {
     already. No need to push a task again.
 */
 void sixtop_timeout_timer_cb(opentimers_id_t id) {
-    timer_sixtop_six2six_timeout_fired();
+    // TODO replace by evetn?
+    // timer_sixtop_six2six_timeout_fired();
 }
 
 //======= EB/KA task
@@ -707,9 +700,9 @@ port_INLINE void sixtop_sendEB(void) {
             (IEEE802154_security_isConfigured() == FALSE) ||
 #ifdef OPENWSN_ICMPV6RPL_C
             (icmpv6rpl_getMyDAGrank() == DEFAULTDAGRANK) ||
-            icmpv6rpl_daoSent() == FALSE) ||
+            (icmpv6rpl_daoSent() == FALSE) ||
 #endif
-            (idmanager_isLeafNode() == TRUE) {
+            (idmanager_isLeafNode() == TRUE)) {
         // I'm not sync'ed, or did not join, or did not acquire a DAGrank or did not send out a DAO
         // before starting to advertize the network, we need to make sure that we are reachable downwards,
         // thus, the condition if DAO was sent
