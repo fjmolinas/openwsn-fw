@@ -31,6 +31,12 @@ void _sock_transmit_internal(void);
 
 //============================= public ========================================
 
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *cb_arg)
+{
+    sock->async_cb = cb;
+    sock->async_cb_arg = cb_arg;
+}
+
 void sock_udp_init(void) {
     udp_socket_list = NULL;
 }
