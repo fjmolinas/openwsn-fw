@@ -132,7 +132,10 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len, const sock_udp
     pkt->owner = COMPONENT_SOCK_TO_UDP;
     pkt->creator = COMPONENT_SOCK_TO_UDP;
 
-    packetfunctions_reserveHeader(&pkt, len);
+    if(packetfunctions_reserveHeader(&pkt, len)) {
+        openqueue_freePacketBuffer(pkt);
+        return -ENOBUFS;
+    }
     memcpy(pkt->payload, data, len);
 
     scheduler_push_task(_sock_transmit_internal, TASKPRIO_UDP);
@@ -242,6 +245,31 @@ void sock_receive_internal(void) {
     if (current == NULL) {
         openqueue_freePacketBuffer(pkt);
         openserial_printf("no associated socket found\n");
+    }
+}
+
+void sock_sendone_internal(OpenQueueEntry_t *msg, owerror_t error)
+{
+    OpenQueueEntry_t *pkt;
+    sock_udp_t *current;
+
+    pkt = openqueue_getPacketByComponent(COMPONENT_UDP);
+
+    if (pkt == NULL) {
+        openserial_printf("found nothing\n");
+        return;
+    }
+
+    current = udp_socket_list;
+
+    while (current != NULL) {
+        if (current->gen_sock.local.port == pkt->l4_sourcePortORicmpv6Type &&
+            current->async_cb != NULL ) {
+            current->txrx = pkt;
+            current->async_cb(current, SOCK_ASYNC_MSG_SENT, &error);
+            break;
+        }
+        current = current->next;
     }
 }
 
