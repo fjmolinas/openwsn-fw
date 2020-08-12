@@ -114,4 +114,12 @@
 #error "CoAP requires a transport layer, i.e. UDP or TCP."
 #endif
 
+#if defined(OPENWSN_USERIALBRIDGE_C)
+#warning "Deprecated: openserialbridge is no longer used in OpenWSN"
+#endif
+
+#if defined(OPENWSN_UEXPIRATION_C)
+#warning "Deprecated: uexpiration is not compatible with the new sock udp api"
+#endif
+
 #endif /* OPENWSN_CHECK_CONFIG_H */
