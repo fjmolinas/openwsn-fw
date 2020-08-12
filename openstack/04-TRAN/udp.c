@@ -30,7 +30,7 @@ void udp_receive(OpenQueueEntry_t *msg) {
 
     scheduler_push_task(sock_receive_internal, TASKPRIO_UDP);
 
-    packetfunctions_tossHeader(msg, sizeof(udp_ht));
+    packetfunctions_tossHeader(&msg, sizeof(udp_ht));
     msg->l4_length = msg->length;
     msg->l4_payload = msg->payload;
 }
@@ -39,7 +39,7 @@ void udp_transmit(OpenQueueEntry_t *msg) {
     msg->l4_protocol_compressed = FALSE;
     msg->l4_protocol = IANA_UDP;
 
-    packetfunctions_reserveHeaderSize(msg, sizeof(udp_ht));
+    packetfunctions_reserveHeader(&msg, sizeof(udp_ht));
     packetfunctions_htons(msg->l4_sourcePortORicmpv6Type, &(msg->payload[0]));
     packetfunctions_htons(msg->l4_destination_port, &(msg->payload[2]));
     packetfunctions_htons(msg->length, &(msg->payload[4]));
