@@ -290,6 +290,13 @@
  */
 #define PACKETQUEUE_LENGTH              20
 
+/**
+ * \def DEADLINE_OPTION_ENABLED
+ *
+ * Enables IPv6 Deadline hop-by-hop forwarding to upper layers
+ *
+ */
+#define DEADLINE_OPTION_ENABLED
 // ======================== Board configuration ========================
 
 /**

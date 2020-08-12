@@ -1098,7 +1098,7 @@ owerror_t iphc_prependIPv6DeadlineHeader(OpenQueueEntry_t **msg) {
         asn_len = iphc_getAsnLen(asn_array);
 
         if (packetfunctions_reserveHeader(msg, asn_len) == E_FAIL) {
-            return E_FAIL
+            return E_FAIL;
         }
         memcpy(&((*msg)->payload[0]), &asn_array, asn_len * sizeof(uint8_t));
         temp_len += asn_len;
