@@ -4,8 +4,6 @@
 
 #include "opendefs.h"
 #include "sock.h"
-#include "sock_types.h"
-#include "async_types.h"
 #include "errno.h"
 #include "packetfunctions.h"
 #include "openqueue.h"
@@ -25,7 +23,7 @@ sock_udp_t *udp_socket_list;
 
 static bool _sock_valid_af(uint8_t af);
 
-static bool _sock_valid_addr(sock_ip_ep_t *ep);
+static bool _sock_valid_addr(sock_udp_ep_t *ep);
 
 static void _sock_get_local_addr(open_addr_t *local);
 
@@ -63,7 +61,7 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local, const sock_udp
         if (_sock_valid_af(remote->family) == FALSE) {
             return -EAFNOSUPPORT;
         }
-        if (_sock_valid_addr((sock_ip_ep_t *) remote) == FALSE) {
+        if (_sock_valid_addr((sock_udp_ep_t *) remote) == FALSE) {
             return -EINVAL;
         }
 
@@ -101,7 +99,7 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len, const sock_udp
         if (_sock_valid_af(remote->family) == FALSE) {
             return -EAFNOSUPPORT;
         }
-        if (_sock_valid_addr((sock_ip_ep_t *) remote) == FALSE) {
+        if (_sock_valid_addr((sock_udp_ep_t *) remote) == FALSE) {
             return -EINVAL;
         }
 
@@ -133,7 +131,10 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len, const sock_udp
     pkt->owner = COMPONENT_SOCK_TO_UDP;
     pkt->creator = COMPONENT_SOCK_TO_UDP;
 
-    packetfunctions_reserveHeaderSize(pkt, len);
+    if(packetfunctions_reserveHeader(&pkt, len)) {
+        openqueue_freePacketBuffer(pkt);
+        return -ENOBUFS;
+    }
     memcpy(pkt->payload, data, len);
 
     scheduler_push_task(_sock_transmit_internal, TASKPRIO_UDP);
@@ -145,14 +146,45 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len, const sock_udp
 }
 
 void sock_udp_close(sock_udp_t *sock) {
+    sock_udp_t* temp = udp_socket_list;
+    sock_udp_t* prev = udp_socket_list;
 
+    /* check if head is the socket to be closed */
+    if (temp != NULL && temp == sock)
+    {
+        udp_socket_list = temp->next;
+        return;
+    }
+
+    /* search for the socket to be deleted, keep the previous one to
+       be able to update next */
+    while (temp != NULL && temp != sock)
+    {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (temp == NULL) {
+        return;
+    }
+
+    /* remove socket from linked list */
+    prev->next = temp->next;
 }
 
 int sock_udp_get_local(sock_udp_t *sock, sock_udp_ep_t *ep) {
+    if (sock->gen_sock.local.family == AF_UNSPEC) {
+        return -EADDRINUSE;
+    }
+    memcpy(ep, &sock->gen_sock.local, sizeof(sock_udp_ep_t));
     return 0;
 }
 
 int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep) {
+    if (sock->gen_sock.remote.family == AF_UNSPEC) {
+        return -ENOTCONN;
+    }
+    memcpy(ep, &sock->gen_sock.remote, sizeof(sock_udp_ep_t));
     return 0;
 }
 
@@ -215,6 +247,31 @@ void sock_receive_internal(void) {
     }
 }
 
+void sock_sendone_internal(OpenQueueEntry_t *msg, owerror_t error)
+{
+    OpenQueueEntry_t *pkt;
+    sock_udp_t *current;
+
+    pkt = openqueue_getPacketByComponent(COMPONENT_UDP);
+
+    if (pkt == NULL) {
+        openserial_printf("found nothing\n");
+        return;
+    }
+
+    current = udp_socket_list;
+
+    while (current != NULL) {
+        if (current->gen_sock.local.port == pkt->l4_sourcePortORicmpv6Type &&
+            current->async_cb != NULL ) {
+            current->txrx = pkt;
+            current->async_cb(current, SOCK_ASYNC_MSG_SENT, &error);
+            break;
+        }
+        current = current->next;
+    }
+}
+
 //============================= private =======================================
 
 void _sock_transmit_internal(void) {
@@ -249,7 +306,7 @@ static void _sock_get_local_addr(open_addr_t *local) {
     memcpy(local->addr_128b + 8, id64b_addr->addr_64b, 8);
 }
 
-static bool _sock_valid_addr(sock_ip_ep_t *ep) {
+static bool _sock_valid_addr(sock_udp_ep_t *ep) {
     uint8_t zero_count;
 
     const uint8_t *p = (uint8_t * ) & ep->addr;
@@ -267,6 +324,5 @@ static bool _sock_valid_addr(sock_ip_ep_t *ep) {
 
     return TRUE;
 }
-
 
 #endif

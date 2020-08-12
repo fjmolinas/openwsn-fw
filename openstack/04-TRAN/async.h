@@ -2,8 +2,6 @@
 #define OPENWSN_ASYNC_SOCKET_H
 
 #include "sock.h"
-#include "async_types.h"
-
 
 /**
  * @brief   Event callback for @ref sock_udp_t

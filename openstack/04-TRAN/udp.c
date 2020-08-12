@@ -17,6 +17,8 @@
 //=========================== public ==========================================
 
 void udp_sendDone(OpenQueueEntry_t *msg, owerror_t error) {
+    msg->owner = COMPONENT_UDP;
+    sock_sendone_internal(msg, error);
     openqueue_freePacketBuffer(msg);
 }
 
