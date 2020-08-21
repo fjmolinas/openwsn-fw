@@ -2,7 +2,10 @@
 #define OPENWSN_SOCK_H
 
 #include "opendefs.h"
+
+#ifdef SOCK_HAS_ASYNC
 #include "async_types.h"
+#endif
 
 /**
  * @brief   A Common IP-based transport layer endpoint

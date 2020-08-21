@@ -3,7 +3,7 @@
 #if defined(OPENWSN_UDP_C)
 
 #include "opendefs.h"
-#include "net/sock/udp.h"
+#include "opentimers.h"
 // #include "sock.h"
 #include "errno.h"
 #include "packetfunctions.h"
@@ -14,11 +14,25 @@
 #include "scheduler.h"
 #include "openserial.h"
 
+#include "net/sock/udp.h"
+#include "openwsn_log.h"
+#ifdef MODULE_ZTIMER
+#include "ztimer.h"
+#endif /* MODULE_ZTIMER */
+
 //============================ defines ========================================
 
-sock_udp_t *udp_socket_list;
+#ifdef MODULE_OPENWSN
+#define _MSG_TYPE_RECV_PKT (0x1601)
+#ifdef MODULE_ZTIMER
+#define _TIMEOUT_MAGIC     (0xF38A0B63U)
+#define _TIMEOUT_MSG_TYPE  (0x8474)
+#endif /* MODULE_ZTIMER */
+#endif /* MODULE_OPENWSN */
 
 //=========================== variables =======================================
+
+static sock_udp_t *_udp_socket_list;
 
 //=========================== prototypes ======================================
 
@@ -28,12 +42,16 @@ static bool _sock_valid_addr(sock_udp_ep_t *ep);
 
 static void _sock_get_local_addr(open_addr_t *local);
 
-void _sock_transmit_internal(void);
+static void _sock_transmit_internal(void);
+
+#ifdef MODULE_ZTIMER
+static void _timeout_cb(void *arg);
+#endif
 
 //============================= public ========================================
 
 void sock_udp_init(void) {
-    udp_socket_list = NULL;
+    _udp_socket_list = NULL;
 }
 
 int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local, const sock_udp_ep_t *remote, uint16_t flags) {
@@ -43,9 +61,13 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local, const sock_udp
         return -EINVAL;
     }
 
+#ifdef MODULE_OPENWSN
+    mbox_init(&sock->mbox, sock->mbox_queue, OPENWSN_SOCK_MBOX_SIZE);
+#endif
+
     memset(&sock->gen_sock.local, 0, sizeof(sock_udp_ep_t));
     if (local != NULL) {
-        current = udp_socket_list;
+        current = _udp_socket_list;
 
         while (current != NULL) {
             if (current->gen_sock.local.port == local->port) {
@@ -70,10 +92,13 @@ int sock_udp_create(sock_udp_t *sock, const sock_udp_ep_t *local, const sock_udp
     }
 
     sock->gen_sock.flags = flags;
-    sock->async_cb = NULL;
 
-    sock->next = udp_socket_list;
-    udp_socket_list = sock;
+#ifdef SOCK_HAS_ASYNC
+    sock->async_cb = NULL;
+#endif
+
+    sock->next = _udp_socket_list;
+    _udp_socket_list = sock;
 
     return 0;
 }
@@ -138,22 +163,22 @@ int sock_udp_send(sock_udp_t *sock, const void *data, size_t len, const sock_udp
     }
     memcpy(pkt->payload, data, len);
 
-    scheduler_push_task(_sock_transmit_internal, TASKPRIO_UDP);
-
     pkt->l4_payload = pkt->payload;
     pkt->l4_length = pkt->length;
+
+    scheduler_push_task(_sock_transmit_internal, TASKPRIO_UDP);
 
     return len;
 }
 
 void sock_udp_close(sock_udp_t *sock) {
-    sock_udp_t* temp = udp_socket_list;
-    sock_udp_t* prev = udp_socket_list;
+    sock_udp_t* temp = _udp_socket_list;
+    sock_udp_t* prev = _udp_socket_list;
 
     /* check if head is the socket to be closed */
     if (temp != NULL && temp == sock)
     {
-        udp_socket_list = temp->next;
+        _udp_socket_list = temp->next;
         return;
     }
 
@@ -189,31 +214,73 @@ int sock_udp_get_remote(sock_udp_t *sock, sock_udp_ep_t *ep) {
     return 0;
 }
 
+
 int sock_udp_recv(sock_udp_t *sock, void *data, size_t max_len, uint32_t timeout, sock_udp_ep_t *remote) {
     uint16_t bytes_to_copy;
     sock_udp_ep_t ep;
+    OpenQueueEntry_t *pkt = NULL;
 
-    if (sock->txrx == NULL) {
+#ifdef MODULE_OPENWSN
+    msg_t msg;
+#ifdef MODULE_ZTIMER
+    ztimer_t timer;
+
+    if ((timeout != SOCK_NO_TIMEOUT) && (timeout != 0)) {
+        timer.callback = _timeout_cb;
+        timer.arg = &sock->mbox;
+        ztimer_set(ZTIMER_USEC, &timer, timeout);
+    }
+#endif /* MODULE_ZTIMER */
+    if (timeout != 0) {
+        mbox_get(&sock->mbox, &msg);
+    }
+    else {
+        if (!mbox_try_get(&sock->mbox, &msg)) {
+            return -EAGAIN;
+        }
+    }
+#ifdef MODULE_ZTIMER
+    ztimer_remove(ZTIMER_USEC, &timer);
+#endif /* MODULE_ZTIMER */
+    switch (msg.type) {
+        case _MSG_TYPE_RECV_PKT:
+            pkt = msg.content.ptr;
+            break;
+#ifdef MODULE_ZTIMER
+        case _TIMEOUT_MSG_TYPE:
+            if (msg.content.value == _TIMEOUT_MAGIC) {
+                return -ETIMEDOUT;
+            }
+#endif /* MODULE_ZTIMER */
+            /* Falls Through. */
+        default:
+            return -EINVAL;
+    }
+#else /* MODULE_OPENWSN */
+    pkt = sock->txrx;
+#endif /* MODULE_OPENWSN */
+
+    if (pkt == NULL) {
         return -EINVAL;
     }
 
-    if (max_len >= sock->txrx->l4_length) {
-        bytes_to_copy = sock->txrx->l4_length;
+    if (max_len >= pkt->l4_length) {
+        bytes_to_copy = pkt->l4_length;
     } else {
         bytes_to_copy = max_len;
     }
 
     if (remote != NULL){
         ep.family = AF_INET6;
-        ep.port = sock->txrx->l4_sourcePortORicmpv6Type;
-        memcpy(&ep.addr, sock->txrx->l3_sourceAdd.addr_128b, LENGTH_ADDR128b);
+        ep.port = pkt->l4_sourcePortORicmpv6Type;
+        memcpy(&ep.addr, pkt->l3_sourceAdd.addr_128b, LENGTH_ADDR128b);
         memcpy(remote, &ep, sizeof(sock_udp_ep_t));
     }
 
     memset(data, 0, max_len);
-    memcpy(data, sock->txrx->l4_payload, bytes_to_copy);
+    memcpy(data, pkt->l4_payload, bytes_to_copy);
 
-    openqueue_freePacketBuffer(sock->txrx);
+    openqueue_freePacketBuffer(pkt);
 
     return bytes_to_copy;
 }
@@ -229,14 +296,26 @@ void sock_receive_internal(void) {
         return;
     }
 
-    current = udp_socket_list;
+    current = _udp_socket_list;
     while (current != NULL) {
         if (current->gen_sock.local.port == pkt->l4_destination_port &&
-            current->async_cb != NULL &&
             idmanager_isMyAddress(&pkt->l3_destinationAdd)) {
-
+#ifdef MODULE_OPENWSN
+            msg_t msg;
+            msg.type = _MSG_TYPE_RECV_PKT;
+            msg.content.ptr = pkt;
+            int ret = mbox_try_put(&current->mbox, &msg);
+            if (ret < 1) {
+                LOG_RIOT_DEBUG("openwsn_sock: dropped message to %p (was full)\n", (void*) &current->mbox);
+            }
+#else /* MODULE_OPENWSN */
             current->txrx = pkt;
-            current->async_cb(current, SOCK_ASYNC_MSG_RECV, NULL);
+#endif /* MODULE_OPENWSN */
+#ifdef SOCK_HAS_ASYNC
+            if (current->async_cb != NULL) {
+                current->async_cb(current, SOCK_ASYNC_MSG_RECV, NULL);
+            }
+#endif /* SOCK_HAS_ASYNC */
             break;
         }
         current = current->next;
@@ -250,6 +329,7 @@ void sock_receive_internal(void) {
 
 void sock_sendone_internal(OpenQueueEntry_t *msg, owerror_t error)
 {
+#ifdef SOCK_HAS_ASYNC
     OpenQueueEntry_t *pkt;
     sock_udp_t *current;
 
@@ -260,22 +340,44 @@ void sock_sendone_internal(OpenQueueEntry_t *msg, owerror_t error)
         return;
     }
 
-    current = udp_socket_list;
+    current = _udp_socket_list;
 
     while (current != NULL) {
         if (current->gen_sock.local.port == pkt->l4_sourcePortORicmpv6Type &&
             current->async_cb != NULL ) {
+#ifdef MODULE_OPENWSN
+        /* In RIOT we can't know what message was sent... */
+#else
             current->txrx = pkt;
+#endif /* MODULE_OPENWSN */
             current->async_cb(current, SOCK_ASYNC_MSG_SENT, &error);
             break;
         }
         current = current->next;
     }
+#else /* SOCK_HAS_ASYNC */
+    (void) msg;
+    (void) error;
+#endif /*SOCK_HAS_ASYNC */
 }
 
 //============================= private =======================================
 
-void _sock_transmit_internal(void) {
+#ifdef MODULE_ZTIMER
+static void _timeout_cb(void *arg)
+{
+    msg_t timeout_msg = { .sender_pid = KERNEL_PID_UNDEF,
+                          .type = _TIMEOUT_MSG_TYPE,
+                          .content = { .value = _TIMEOUT_MAGIC } };
+    mbox_t *mbox = arg;
+
+    /* should be safe, because otherwise if mbox were filled this callback is
+     * senseless */
+    mbox_try_put(mbox, &timeout_msg);
+}
+#endif /* MODULE_ZTIMER */
+
+static void _sock_transmit_internal(void) {
     OpenQueueEntry_t *pkt;
 
     pkt = openqueue_getPacketByComponent(COMPONENT_SOCK_TO_UDP);
@@ -325,5 +427,20 @@ static bool _sock_valid_addr(sock_udp_ep_t *ep) {
 
     return TRUE;
 }
+
+#ifdef SOCK_HAS_ASYNC
+void sock_udp_set_cb(sock_udp_t *sock, sock_udp_cb_t cb, void *cb_arg)
+{
+    sock->async_cb = cb;
+    sock->async_cb_arg = cb_arg;
+}
+
+#ifdef SOCK_HAS_ASYNC_CTX
+sock_async_ctx_t *sock_udp_get_async_ctx(sock_udp_t *sock)
+{
+    return &sock->async_ctx;
+}
+#endif /* SOCK_HAS_ASYNC_CTX*/
+#endif /* SOCK_HAS_ASYNC */
 
 #endif
