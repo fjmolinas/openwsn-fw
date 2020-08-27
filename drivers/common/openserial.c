@@ -398,6 +398,10 @@ void task_openserial_debugPrint(void) {
             if (debugPrint_msf() == TRUE) {
                 break;
             }
+        case STATUS_FRAG:
+            if (debugPrint_frag() == TRUE) {
+                break;
+            }
         default:
             debugPrintCounter = 0;
     }

@@ -28,7 +28,11 @@
  * If L2 security is not active MAX_FRAGMENT_SIZE can be set to 96 bytes, but the corresponding variable in
  * openvisualizer must then also be updated to the same value.
  */
+#ifdef OPENWSN_IEEE802154E_SECURITY_C
 #define MAX_FRAGMENT_SIZE           80
+#else
+#define MAX_FRAGMENT_SIZE           96
+#endif
 
 #define FRAGMENT_BUFFER_SIZE        (((IPV6_PACKET_SIZE / MAX_FRAGMENT_SIZE) + 1) * BIGQUEUELENGTH)
 #define NUM_OF_VRBS                 2
@@ -113,5 +117,7 @@ void frag_sendDone(OpenQueueEntry_t *msg, owerror_t sendError);
 void frag_receive(OpenQueueEntry_t *msg);
 
 owerror_t frag_fragment6LoPacket(OpenQueueEntry_t *msg);
+
+bool debugPrint_frag(void);
 
 #endif /* OPENWSN_FRAG_H */
