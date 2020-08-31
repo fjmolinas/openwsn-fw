@@ -768,7 +768,7 @@ void frag_timeout_cb(opentimers_id_t id) {
 
 bool debugPrint_frag() {
     uint8_t max_frag_size = MAX_FRAGMENT_SIZE;
-    openserial_printStatus(STATUS_FRAG, &max_frag_size, sizeof(uint8_t);
+    openserial_printStatus(STATUS_FRAG, &max_frag_size, sizeof(uint8_t));
     return TRUE;
 }
 
