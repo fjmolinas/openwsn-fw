@@ -185,6 +185,8 @@ enum {
    COMPONENT_UEXPIRATION               = 0x29,
    COMPONENT_UMONITOR                  = 0x2a,
    COMPONENT_CINFRARED                 = 0x2b,
+   // other
+   COMPONENT_SAP                       = 0x2c,
 };
 
 /**
