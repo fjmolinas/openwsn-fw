@@ -846,12 +846,7 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
         synchronizePacket(ieee154e_vars.syncCapturedTime);
 
         // declare synchronized
-        LOG_RIOT_DEBUG("[IEE20154E]: synchronized\n");
         changeIsSync(TRUE);
-        // log the info
-        LOG_SUCCESS(COMPONENT_IEEE802154E, ERR_SYNCHRONIZED,
-                (errorparameter_t) ieee154e_vars.slotOffset,
-                (errorparameter_t) 0);
 
         // send received EB up the stack so RES can update statistics (synchronizing)
         notif_receive(ieee154e_vars.dataReceived);
@@ -928,13 +923,7 @@ port_INLINE void activity_ti1ORri1(void) {
             ieee154e_vars.numOfSleepSlots = 1;
 
             // declare myself desynchronized
-            LOG_RIOT_DEBUG("[IEE20154E]: desynchronized\n");
             changeIsSync(FALSE);
-
-            // log the error
-            LOG_ERROR(COMPONENT_IEEE802154E, ERR_DESYNCHRONIZED,
-                      (errorparameter_t)ieee154e_vars.slotOffset,
-                      (errorparameter_t)0);
 
             // update the statistics
             ieee154e_stats.numDeSync++;
@@ -2670,9 +2659,26 @@ void synchronizeAck(PORT_SIGNED_INT_WIDTH timeCorrection) {
 #endif
 }
 
+void __attribute__((weak)) ieee154e_indicate_sync(bool isSync)
+{
+    if(isSync) {
+        // log the info
+        LOG_SUCCESS(COMPONENT_IEEE802154E, ERR_SYNCHRONIZED,
+                (errorparameter_t) ieee154e_vars.slotOffset,
+                (errorparameter_t) 0);
+    }
+    else {
+        // log the error
+        LOG_ERROR(COMPONENT_IEEE802154E, ERR_DESYNCHRONIZED,
+                    (errorparameter_t)ieee154e_vars.slotOffset,
+                    (errorparameter_t)0);
+
+    }
+}
+
 void changeIsSync(bool newIsSync) {
     ieee154e_vars.isSync = newIsSync;
-
+    ieee154e_indicate_sync(newIsSync);
     if (ieee154e_vars.isSync == TRUE) {
         leds_sync_on();
         resetStats();
