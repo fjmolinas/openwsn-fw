@@ -59,7 +59,7 @@ void icmpv6rpl_init(void) {
 
     //=== routing
     icmpv6rpl_vars.haveParent = FALSE;
-    icmpv6rpl_vars.daoSent = FALSE;
+    icmpv6rpl_vars.isReachable = FALSE;
 
     if (idmanager_isPanCoordinator() == TRUE) {
         icmpv6rpl_vars.myDAGrank = MINHOPRANKINCREASE;
