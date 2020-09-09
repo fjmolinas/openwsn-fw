@@ -90,7 +90,9 @@ owerror_t idmanager_setRole(pan_role_t role)
    if (role == ROLE_PAN_COORDINATOR) {
         idmanager_vars.slotSkip = FALSE;
         icmpv6rpl_updateMyDAGrankAndParentSelection();
+#ifndef OPENWSN_MAC_ONLY
         schedule_startPanCoordinator();
+#endif
    }
    ENABLE_INTERRUPTS();
    return E_SUCCESS;
