@@ -55,7 +55,10 @@ void openstack_init(void) {
 
     //===== drivers
     opentimers_init();
+
+#if IS_ACTIVE(MODULE_OPENWSN_SERIAL)
     openserial_init();
+#endif
 
     //===== stack
     //-- cross-layer
@@ -75,14 +78,17 @@ void openstack_init(void) {
     neighbors_init();
     msf_init();
     //-- 03a-IPHC
+
+#if OPENWSN_IPHC_C
     openbridge_init();
     iphc_init();
 
 #if OPENWSN_6LO_FRAGMENTATION_C
     frag_init();
 #endif
-
+#endif
     //-- 03b-IPv6
+#if OPENWSN_IPVC_C
     forwarding_init();
     icmpv6_init();
 
@@ -90,7 +96,10 @@ void openstack_init(void) {
     icmpv6echo_init();
 #endif
 
+#if OPENWSN_ICMPV6RPL_C
     icmpv6rpl_init();
+#endif
+#endif
     //-- 04-TRAN
 
 #if OPENWSN_UDP_C
@@ -98,10 +107,14 @@ void openstack_init(void) {
 #endif
 
     //===== application-layer
+#if OPENWSN_OPENWEB_C
     openweb_init();
+#endif
 
     //===== applications
+#if OPENWSN_OPENAPPS_C
     openapps_init();
+#endif
 
     LOG_SUCCESS(COMPONENT_OPENWSN, ERR_BOOTED, (errorparameter_t) 0, (errorparameter_t) 0);
 }
