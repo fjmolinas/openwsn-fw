@@ -1,3 +1,7 @@
+#include "config.h"
+
+#if OPENWSN_IPHC_C
+
 #include "opendefs.h"
 #include "openbridge.h"
 #include "openserial.h"
@@ -87,3 +91,5 @@ void openbridge_receive(OpenQueueEntry_t *msg) {
 }
 
 //=========================== private =========================================
+
+#endif

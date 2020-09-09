@@ -200,6 +200,19 @@
 #define OPENWSN_CJOIN_C (0)
 #endif
 
+/**
+ * \def OPENWSN_OPENAPPS_C
+ *
+ * Implementation of the CoAP protocol.
+ *
+ * Requires: OPENWSN_UDP_C
+ *
+ */
+#ifndef OPENWSN_OPENAPPS_C
+#define OPENWSN_OPENAPPS_C (1)
+#endif
+
+
 // ======================= OpenWeb configuration =======================
 
 /**
@@ -214,6 +227,18 @@
 #define OPENWSN_COAP_C (0)
 #endif
 
+/**
+ * \def OPENWSN_OPENWEB_C
+ *
+ * Implementation of the CoAP protocol.
+ *
+ * Requires: OPENWSN_UDP_C
+ *
+ */
+#ifndef OPENWSN_OPENWEB_C
+#define OPENWSN_OPENWEB_C (1)
+#endif
+
 
 // ========================== Stack modules ===========================
 
@@ -226,6 +251,17 @@
 #ifndef OPENWSN_UDP_C
 #define OPENWSN_UDP_C (0)
 #endif
+
+/**
+ * \def OPENWSN_IPHC_C
+ *
+ * Implementation of the IP header compresion (IPHC).
+ *
+ */
+#ifndef OPENWSN_IPHC_C
+#define OPENWSN_IPHC_C (1)
+#endif
+
 
 /**
  * \def OPENWSN_6LO_FRAGMENTATION_C
@@ -251,13 +287,46 @@
 #endif
 #endif
 
+
 /**
- * \def OPENWSN_ICMPV6ECHO_C
+ * \def ADAPTIVE_MSF
+ *
+ * Allow the MSF algorithm to dynamically remove and allocate slots, based on the traffic load in the network.
+ *
+ */
+#ifndef ADAPTIVE_MSF
+#define ADAPTIVE_MSF (0)
+#endif
+
+
+/**
+ * \def OPENWSN_IPV6_C
+ *
+ * Implementation of the IPV6.
+ *
+ */
+#ifndef OPENWSN_IPV6_C
+#define OPENWSN_IPV6_C (1)
+#endif
+
+
+/**
+ * \def OPENWSN_ICMPV6_ECHO_C
  *
  * Enables the icmpv6 echo (ping) functionality
  */
-#ifndef OPENWSN_ICMPV6ECHO_C
-#define OPENWSN_ICMPV6ECHO_C (0)
+#ifndef OPENWSN_ICMPV6_ECHO_C
+#define OPENWSN_ICMPV6_ECHO_C (0)
+#endif
+
+
+/**
+ * \def OPENWSN_ICMPV6RPL_C
+ *
+ * Enables the icmpv6rpl
+ */
+#ifndef OPENWSN_ICMPV6RPL_C
+#define OPENWSN_ICMPV6RPL_C (1)
 #endif
 
 
@@ -292,29 +361,6 @@
  */
 #ifndef OPENWSN_ADAPTIVE_SYNC_C
 #define OPENWSN_ADAPTIVE_SYNC_C (0)
-#endif
-
-
-// ========================== Stack configuration ===========================
-
-/**
- * \def DEADLINE_OPTION
- *
- * Activates IPv6 DEADLINE OPTION.
- *
- */
-#ifndef DEADLINE_OPTION
-#define DEADLINE_OPTION (0)
-#endif
-
-/**
- * \def ADAPTIVE_MSF
- *
- * Allow the MSF algorithm to dynamically remove and allocate slots, based on the traffic load in the network.
- *
- */
-#ifndef ADAPTIVE_MSF
-#define ADAPTIVE_MSF (0)
 #endif
 
 

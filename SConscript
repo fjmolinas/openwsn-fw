@@ -71,7 +71,7 @@ if 'l2-security' in env['modules'].split(','):
 if 'fragmentation' in env['modules'].split(','):
     env.Append(CPPDEFINES='OPENWSN_6LO_FRAGMENTATION_C')
 if 'icmpv6echo' in env['modules'].split(','):
-    env.Append(CPPDEFINES='OPENWSN_ICMPV6ECHO_C')
+    env.Append(CPPDEFINES='OPENWSN_ICMPV6_ECHO_C')
 
 # check which apps we have to include in the build
 if 'c6t' in env['apps'].split(','):
