@@ -1,6 +1,8 @@
 #ifndef OPENWSN_CONFIG_H
 #define OPENWSN_CONFIG_H
 
+#include "kernel_defines.h"
+
 // =========================== Debugging ============================
 
 /**
@@ -197,7 +199,7 @@
  *
  */
 #ifndef OPENWSN_CJOIN_C
-#define OPENWSN_CJOIN_C (0)
+#define OPENWSN_CJOIN_C (IS_ACTIVE(MODULE_OPENWSN_CJOIN))
 #endif
 
 /**
@@ -209,7 +211,7 @@
  *
  */
 #ifndef OPENWSN_OPENAPPS_C
-#define OPENWSN_OPENAPPS_C (1)
+#define OPENWSN_OPENAPPS_C (IS_ACTIVE(MODULE_OPENWSN_OPENAPPS))
 #endif
 
 
@@ -224,7 +226,7 @@
  *
  */
 #ifndef OPENWSN_COAP_C
-#define OPENWSN_COAP_C (0)
+#define OPENWSN_COAP_C (IS_ACTIVE(MODULE_OPENWSN_COAP))
 #endif
 
 /**
@@ -236,7 +238,7 @@
  *
  */
 #ifndef OPENWSN_OPENWEB_C
-#define OPENWSN_OPENWEB_C (1)
+#define OPENWSN_OPENWEB_C (IS_ACTIVE(MODULE_OPENWSN_OPENWEB))
 #endif
 
 
@@ -249,7 +251,7 @@
  *
  */
 #ifndef OPENWSN_UDP_C
-#define OPENWSN_UDP_C (0)
+#define OPENWSN_UDP_C (IS_ACTIVE(MODULE_OPENWSN_TRANSPORT))
 #endif
 
 /**
@@ -259,7 +261,7 @@
  *
  */
 #ifndef OPENWSN_IPHC_C
-#define OPENWSN_IPHC_C (1)
+#define OPENWSN_IPHC_C (IS_ACTIVE(MODULE_OPENWSN_IPHC))
 #endif
 
 
@@ -275,7 +277,7 @@
  *
  */
 #ifndef OPENWSN_6LO_FRAGMENTATION_C
-#define OPENWSN_6LO_FRAGMENTATION_C (0)
+#define OPENWSN_6LO_FRAGMENTATION_C (IS_ACTIVE(MODULE_OPENWSN_6LO_FRAG))
 #endif
 
 #if OPENWSN_6LO_FRAGMENTATION_C
@@ -289,13 +291,13 @@
 
 
 /**
- * \def ADAPTIVE_MSF
+ * \def OPENWSN_ADAPTIVE_MSF
  *
  * Allow the MSF algorithm to dynamically remove and allocate slots, based on the traffic load in the network.
  *
  */
-#ifndef ADAPTIVE_MSF
-#define ADAPTIVE_MSF (0)
+#ifndef OPENWSN_ADAPTIVE_MSF
+#define OPENWSN_ADAPTIVE_MSF (IS_ACTIVE(MODULE_OPENWSN_ADAPTIVE_MSF))
 #endif
 
 
@@ -306,7 +308,7 @@
  *
  */
 #ifndef OPENWSN_IPV6_C
-#define OPENWSN_IPV6_C (1)
+#define OPENWSN_IPV6_C (IS_ACTIVE(MODULE_OPENWSN_IPV6))
 #endif
 
 
@@ -316,7 +318,7 @@
  * Enables the icmpv6 echo (ping) functionality
  */
 #ifndef OPENWSN_ICMPV6_ECHO_C
-#define OPENWSN_ICMPV6_ECHO_C (0)
+#define OPENWSN_ICMPV6_ECHO_C (IS_ACTIVE(MODULE_OPENWSN_ICMPV6_ECHO))
 #endif
 
 
@@ -326,7 +328,7 @@
  * Enables the icmpv6rpl
  */
 #ifndef OPENWSN_ICMPV6RPL_C
-#define OPENWSN_ICMPV6RPL_C (1)
+#define OPENWSN_ICMPV6RPL_C (IS_ACTIVE(MODULE_OPENWSN_IPV6))
 #endif
 
 
@@ -338,7 +340,7 @@
  * Requires: OPENWSN_CJOIN_C, OPENWSN_COAP_C, OPENWSN_UDP_C
  */
 #ifndef OPENWSN_IEEE802154E_SECURITY_C
-#define OPENWSN_IEEE802154E_SECURITY_C (0)
+#define OPENWSN_IEEE802154E_SECURITY_C (IS_ACTIVE(MODULE_OPENWSN_IEEE802154E_SECURITY))
 #endif
 
 
