@@ -1,3 +1,7 @@
+#include "config.h"
+
+#if OPENWSN_IPV6_C
+
 #include "opendefs.h"
 #include "forwarding.h"
 #include "iphc.h"
@@ -852,4 +856,6 @@ void forwarding_createRplOption(rpl_option_ht *rpl_option, uint8_t flags) {
 void forwarding_createDeadlineOption(deadline_option_ht* deadline_option) {
     deadline_option->optionType = DEADLINE_HOPBYHOP_HEADER_OPTION_TYPE;
 }
+#endif
+
 #endif

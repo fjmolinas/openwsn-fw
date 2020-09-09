@@ -1,6 +1,6 @@
 #include "config.h"
 
-#if OPENWSN_ICMPV6ECHO_C
+#if OPENWSN_ICMPV6_ECHO_C
 
 #include "opendefs.h"
 #include "icmpv6echo.h"
@@ -160,5 +160,5 @@ void icmpv6echo_receive(OpenQueueEntry_t *msg) {
 
 }
 
-#endif /* OPENWSN_ICMPV6ECHO_C */
+#endif /* OPENWSN_ICMPV6_ECHO_C */
 //=========================== private =========================================

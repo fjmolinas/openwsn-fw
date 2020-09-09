@@ -1,3 +1,8 @@
+
+#include "config.h"
+
+#if OPENWSN_IPHC_C
+
 #include "opendefs.h"
 #include "iphc.h"
 #include "sixtop.h"
@@ -1317,5 +1322,7 @@ uint8_t iphc_getAsnLen(uint8_t *asn) {
     }
     return 5;
 }
+
+#endif
 
 #endif

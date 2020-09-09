@@ -1,3 +1,8 @@
+
+#include "config.h"
+
+#if OPENWSN_ICMPV6RPL_C
+
 #include "opendefs.h"
 #include "icmpv6rpl.h"
 #include "icmpv6.h"
@@ -1118,3 +1123,4 @@ bool debugPrint_myDAGrank(void) {
     return TRUE;
 }
 
+#endif
