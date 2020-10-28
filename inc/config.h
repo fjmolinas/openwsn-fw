@@ -175,7 +175,7 @@
  *
  */
 #ifndef OPENWSN_UINJECT_C
-#define OPENWSN_UINJECT_C (0)
+#define OPENWSN_UINJECT_C (1)
 #endif
 
 /**
@@ -224,7 +224,7 @@
  *
  */
 #ifndef OPENWSN_UDP_C
-#define OPENWSN_UDP_C (0)
+#define OPENWSN_UDP_C (1)
 #endif
 
 /**
@@ -257,7 +257,7 @@
  * Enables the icmpv6 echo (ping) functionality
  */
 #ifndef OPENWSN_ICMPV6ECHO_C
-#define OPENWSN_ICMPV6ECHO_C (0)
+#define OPENWSN_ICMPV6ECHO_C (1)
 #endif
 
 
@@ -318,7 +318,7 @@
  *  - MSF_LIM_NUMCELLSUSED_LOW: if cell usage is below this value, trigger 6P to remove a single cell to the selected parent
  */
 #ifndef ADAPTIVE_MSF
-#define ADAPTIVE_MSF (0)
+#define ADAPTIVE_MSF (1)
 #endif
 
 #if ADAPTIVE_MSF
@@ -341,7 +341,7 @@
  *
  */
 #ifndef IEEE802154E_SINGLE_CHANNEL
-#define IEEE802154E_SINGLE_CHANNEL      11
+#define IEEE802154E_SINGLE_CHANNEL      0
 #endif
 
 /**
@@ -372,7 +372,7 @@
  *
  */
 #ifndef PANID_DEFINED
-#define PANID_DEFINED   (0xcafe)
+#define PANID_DEFINED   (0xfeca)
 #endif
 
 // ======================== Board configuration ========================
