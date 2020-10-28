@@ -40,82 +40,123 @@ void bspLedToggle(uint8_t ui8Leds);
 //=========================== public ==========================================
 
 void leds_init(void) {
+#if BOARD_LEDS
     GPIOPinTypeGPIOOutput(BSP_LED_BASE, BSP_LED_ALL);
     GPIOPinWrite(BSP_LED_BASE, BSP_LED_ALL, BSP_LED_ALL);
+#endif
 }
 
 // red
 void    leds_error_on(void) {
+#if BOARD_LEDS
     bspLedSet(BSP_LED_1);
+#endif
 }
 void    leds_error_off(void) {
+#if BOARD_LEDS
     bspLedClear(BSP_LED_1);
+#endif
 }
 void    leds_error_toggle(void) {
+#if BOARD_LEDS
     bspLedToggle(BSP_LED_1);
+#endif
 }
 uint8_t leds_error_isOn(void) {
+#if BOARD_LEDS
     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_1);
     return (uint8_t)(ui32Toggle & BSP_LED_1)>>4;
+#endif
 }
 
 // green
 void    leds_sync_on(void) {
+#if BOARD_LEDS
     bspLedSet(BSP_LED_4);
+#endif
 }
 void    leds_sync_off(void) {
+#if BOARD_LEDS
     bspLedClear(BSP_LED_4);
+#endif
 }
 void    leds_sync_toggle(void) {
+#if BOARD_LEDS
     bspLedToggle(BSP_LED_4);
+#endif
 }
 uint8_t leds_sync_isOn(void) {
+#if BOARD_LEDS
     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_4);
     return (uint8_t)(ui32Toggle & BSP_LED_4)>>5;
+#endif
 }
 
 // orange
 void    leds_radio_on(void) {
+#if BOARD_LEDS
     bspLedSet(BSP_LED_2);
+#endif
 }
 void    leds_radio_off(void) {
+#if BOARD_LEDS
     bspLedClear(BSP_LED_2);
+#endif
 }
 void    leds_radio_toggle(void) {
+#if BOARD_LEDS
     bspLedToggle(BSP_LED_2);
+#endif
 }
 uint8_t leds_radio_isOn(void) {
+#if BOARD_LEDS
     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_2);
     return (uint8_t)(ui32Toggle & BSP_LED_2)>>7;
+#endif
 }
 
 // yellow
 void    leds_debug_on(void) {
+#if BOARD_LEDS
     bspLedSet(BSP_LED_3);
+#endif
 }
 void    leds_debug_off(void) {
+#if BOARD_LEDS
     bspLedClear(BSP_LED_3);
+#endif
 }
 void    leds_debug_toggle(void) {
+#if BOARD_LEDS
     bspLedToggle(BSP_LED_3);
+#endif
 }
 uint8_t leds_debug_isOn(void) {
+#if BOARD_LEDS
     uint32_t ui32Toggle = GPIOPinRead(BSP_LED_BASE, BSP_LED_3);
     return (uint8_t)(ui32Toggle & BSP_LED_3)>>6;
+#endif
 }
 
 // all
 void leds_all_on(void) {
+#if BOARD_LEDS
     bspLedSet(BSP_LED_ALL);
+#endif
 }
 void leds_all_off(void) {
+#if BOARD_LEDS
     bspLedClear(BSP_LED_ALL);
+#endif
 }
 void leds_all_toggle(void) {
+#if BOARD_LEDS
     bspLedToggle(BSP_LED_ALL);
+#endif
 }
 
 void leds_error_blink(void) {
+#if BOARD_LEDS
     uint8_t i;
     volatile uint16_t delay;
 
@@ -128,9 +169,11 @@ void leds_error_blink(void) {
         for (delay=0xffff;delay>0;delay--);
         for (delay=0xffff;delay>0;delay--);
     }
+#endif
 }
 
 void leds_circular_shift(void) {
+#if BOARD_LEDS
     uint8_t i;
     volatile uint16_t delay;
 
@@ -152,9 +195,11 @@ void leds_circular_shift(void) {
         for (delay=0xffff;delay>0;delay--);
         bspLedClear(BSP_LED_ALL);
    }
+#endif
 }
 
 void leds_increment(void) {
+#if BOARD_LEDS
     uint8_t i;
     volatile uint16_t delay;
 
@@ -173,25 +218,31 @@ void leds_increment(void) {
         for (delay=0xffff;delay>0;delay--);
         bspLedClear(BSP_LED_ALL);
     }
+#endif
 }
 
 //=========================== private =========================================
 
 port_INLINE void bspLedSet(uint8_t ui8Leds){
+#if BOARD_LEDS
     //
     // Turn on specified LEDs
     //
     GPIOPinWrite(BSP_LED_BASE, ui8Leds, 0);
+#endif
 }
 
 port_INLINE void bspLedClear(uint8_t ui8Leds){
+#if BOARD_LEDS
     //
     // Turn off specified LEDs
     //
     GPIOPinWrite(BSP_LED_BASE, ui8Leds, ui8Leds);
+#endif
 }
 
 port_INLINE void bspLedToggle(uint8_t ui8Leds){
+#if BOARD_LEDS
     //
     // Get current pin values of selected bits
     //
@@ -206,4 +257,5 @@ port_INLINE void bspLedToggle(uint8_t ui8Leds){
     // Set GPIO
     //
     GPIOPinWrite(BSP_LED_BASE, ui8Leds, ui32Toggle);
+#endif
 }
