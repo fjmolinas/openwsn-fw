@@ -1079,7 +1079,7 @@ port_INLINE void activity_ti1ORri1(void) {
                     endSlot();
                     return;
                 }
-                
+
                 // configure the radio to listen to the default synchronizing channel
                 radio_setFrequency(ieee154e_vars.freq, FREQ_TX);
 
@@ -1117,7 +1117,7 @@ port_INLINE void activity_ti1ORri1(void) {
             // 3.  set capture interrupt for Rx SFD done and receiving packet done
             sctimer_setCapture(ACTION_RX_SFD_DONE);
             sctimer_setCapture(ACTION_RX_DONE);
-        
+
             // configure the radio to listen to the default synchronizing channel
             radio_setFrequency(ieee154e_vars.freq, FREQ_RX);
 #else
@@ -1418,6 +1418,9 @@ port_INLINE void activity_tie5(void) {
     ieee154e_vars.dataToSend->l2_retriesLeft--;
 
     if (ieee154e_vars.dataToSend->l2_retriesLeft == 0) {
+        LOG_ERROR(COMPONENT_IEEE802154E, ERR_MAXRETRIES_REACHED,
+                (errorparameter_t)0,
+                (errorparameter_t)0);
         // indicate tx fail if no more retries left
         notif_sendDone(ieee154e_vars.dataToSend, E_FAIL);
     } else {
@@ -2866,6 +2869,9 @@ void endSlot(void) {
 
         if (ieee154e_vars.dataToSend->l2_retriesLeft == 0) {
             // indicate tx fail if no more retries left
+            LOG_ERROR(COMPONENT_IEEE802154E, ERR_MAXRETRIES_REACHED,
+                (errorparameter_t)0,
+                (errorparameter_t)0);
             notif_sendDone(ieee154e_vars.dataToSend, E_FAIL);
         } else {
             // return packet to the virtual COMPONENT_SIXTOP_TO_IEEE802154E component
