@@ -679,9 +679,6 @@ void registerNewNeighbor(open_addr_t *address,
         while (i < MAXNUMNEIGHBORS) {
             if (neighbors_vars.neighbors[i].used == FALSE) {
                 if (rssi < GOODNEIGHBORMINRSSI) {
-                    LOG_ERROR(COMPONENT_NEIGHBORS, ERR_NEW_NEIGHBOR,
-                             (errorparameter_t) rssi,
-                             (errorparameter_t) 0);
                     break;
                 }
                 LOG_SUCCESS(COMPONENT_NEIGHBORS, ERR_NEW_NEIGHBOR,
