@@ -433,6 +433,18 @@
 
 
 /**
+ * \def BOARD_DEEP_SLEEP
+ *
+ * Turn on leds
+ *
+ */
+#ifndef BOARD_DEEP_SLEEP
+#define BOARD_DEEP_SLEEP (0)
+#endif
+
+
+
+/**
  * \def BOARD_FASTSIM_ENABLED
  *
  * Enables fast UART printing in simulation mode. Active by default.
