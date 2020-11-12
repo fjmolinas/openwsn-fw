@@ -2147,9 +2147,9 @@ port_INLINE void activity_ri8(PORT_TIMER_WIDTH capturedTime) {
 
 port_INLINE void activity_rie6(void) {
     // log the error
-    LOG_ERROR(COMPONENT_IEEE802154E, ERR_WDACKDURATION_OVERFLOWS,
-              (errorparameter_t) ieee154e_vars.state,
-              (errorparameter_t) ieee154e_vars.slotOffset);
+    // LOG_ERROR(COMPONENT_IEEE802154E, ERR_WDACKDURATION_OVERFLOWS,
+    //           (errorparameter_t) ieee154e_vars.state,
+    //           (errorparameter_t) ieee154e_vars.slotOffset);
     // abort
     endSlot();
 }
