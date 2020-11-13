@@ -51,6 +51,8 @@ void scheduler_start(void);
 void scheduler_push_task(task_cbt task_cb, task_prio_t prio);
 
 #if SCHEDULER_DEBUG_ENABLE
+void scheduler_debug_TasksSum_reset(void);
+uint32_t scheduler_debug_get_TasksSum(void);
 uint8_t scheduler_debug_get_TasksCur(void);
 uint8_t scheduler_debug_get_TasksMax(void);
 #endif

@@ -25,6 +25,7 @@ typedef struct {
 typedef struct {
    uint8_t                        numTasksCur;
    uint8_t                        numTasksMax;
+   uint32_t                       numTasksSum;
 } scheduler_dbg_t;
 #endif
 
