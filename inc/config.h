@@ -465,7 +465,7 @@
  *
  */
 #ifndef SCHEDULER_DEBUG_ENABLE
-#define SCHEDULER_DEBUG_ENABLE (0)
+#define SCHEDULER_DEBUG_ENABLE (1)
 #endif
 
 #include "check_config.h"
