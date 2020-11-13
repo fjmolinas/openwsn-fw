@@ -14,6 +14,7 @@
 #include "icmpv6rpl.h"
 #include "idmanager.h"
 #include "openrandom.h"
+#include "scheduler.h"
 
 #include "msf.h"
 
@@ -154,7 +155,7 @@ void _uinject_task_cb(void) {
     remote.family = AF_INET6;
     memcpy(remote.addr.ipv6, uinject_dst_addr, sizeof(uinject_dst_addr));
 
-    uint8_t payload[50];
+    uint8_t payload[60];
     uint8_t len = 0;
     // add 'uinject' string
     memcpy(&payload[len], uinject_payload, sizeof(uinject_payload) - 1);
@@ -178,10 +179,17 @@ void _uinject_task_cb(void) {
     uint32_t ticksOn;
     uint32_t ticksInTotal;
     ieee154e_getTicsInfo(&ticksOn, &ticksInTotal);
-    memcpy(&payload[len], (uint8_t*) ticksOn, sizeof(ticksOn));
+    memcpy(&payload[len],  &ticksOn, sizeof(ticksOn));
     len += sizeof(ticksOn);
-    memcpy(&payload[len], (uint8_t*) ticksInTotal, sizeof(ticksInTotal));
+    memcpy(&payload[len],  &ticksInTotal, sizeof(ticksInTotal));
     len += sizeof(ticksInTotal);
+    // add tasks info
+    uint8_t TasksMax = scheduler_debug_get_TasksMax();
+    uint32_t TasksSum = scheduler_debug_get_TasksSum();
+    scheduler_debug_TasksSum_reset();
+    payload[len++] = TasksMax;
+    memcpy(&payload[len],  &TasksSum, sizeof(TasksSum));
+    len += sizeof(TasksSum);
 
     if (sock_udp_send(&_sock, payload, len, &remote) > 0) {
         // set busySending to TRUE
