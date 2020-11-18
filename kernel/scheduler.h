@@ -35,7 +35,7 @@ typedef enum {
     TASKPRIO_MAX                   = 0x10,
 } task_prio_t;
 
-#define TASK_LIST_DEPTH           10
+#define TASK_LIST_DEPTH           20
 
 //=========================== typedef =========================================
 
