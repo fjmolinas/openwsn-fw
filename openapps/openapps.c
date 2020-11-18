@@ -36,6 +36,10 @@
 #include "uinject.h"
 #endif
 
+#if OPENWSN_URTOS_C
+#include "urtos.h"
+#endif
+
 #if OPENWSN_USERIALBRIDGE_C
 #include "userialbridge.h"
 #endif
@@ -91,6 +95,10 @@ void openapps_init(void) {
 
 #if OPENWSN_UINJECT_C
     uinject_init();
+#endif
+
+#if OPENWSN_URTOS_C
+    urtos_init();
 #endif
 
 #if OPENWSN_USERIALBRIDGE_C

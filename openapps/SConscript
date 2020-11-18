@@ -14,6 +14,7 @@ apps = [
     'cwellknown',
     'uecho',
     'uinject',
+    'urtos',
     'userialbridge',
     'uexpiration',
     'uexpiration_monitor',
@@ -39,7 +40,7 @@ sources_h += [os.path.join("cjoin", "cojp_cbor.h")]
 #===== build the openapps library
 
 if localEnv['board']=='python':
-    
+
     for s in sources_c+sources_h:
         temp = localEnv.Objectify(
             target = localEnv.ObjectifiedFilename(s),
@@ -51,9 +52,9 @@ if localEnv['board']=='python':
         source = [localEnv.ObjectifiedFilename(s) for s in sources_c],
     )
     localEnv.Depends(libopenapps, [localEnv.ObjectifiedFilename(s) for s in sources_h])
-    
+
 else:
-    
+
     localEnv.Append(
         CPPPATH = [
             # inc

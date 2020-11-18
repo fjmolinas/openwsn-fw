@@ -179,6 +179,18 @@
 #endif
 
 /**
+ * \def OPENWSN_URTOS_C
+ *
+ * Application that creates UDP traffic and injects it in the network.
+ *
+ * Requires: OPENWSN_UDP_C
+ *
+ */
+#ifndef OPENWSN_URTOS_C
+#define OPENWSN_URTOS_C (0)
+#endif
+
+/**
  * \def OPENWSN_USERIALBRIDGE_C
  *
  * Requires: OPENWSN_UDP_C
