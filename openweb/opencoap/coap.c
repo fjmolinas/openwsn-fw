@@ -93,8 +93,9 @@ void coap_init(void) {
 
     // register at UDP stack
     memset(&coap_vars.sock, 0, sizeof(sock_udp_t));
+    local.family = AF_INET6;
+    local.netif = SOCK_ADDR_ANY_NETIF;
     local.port = WKP_UDP_COAP;
-
     if (sock_udp_create(&coap_vars.sock, &local, NULL, 0) < 0) {
         openserial_printf("Could not create socket\n");
         return;
@@ -1023,9 +1024,9 @@ owerror_t coap_sock_send_internal(OpenQueueEntry_t *msg) {
     int16_t res;
 
     // init remote endpoint
-    remote.family = AF_INET6;
     memcpy(&remote.addr, &msg->l3_destinationAdd.addr_128b, LENGTH_ADDR128b);
-    remote.netif = 0;
+    remote.family = AF_INET6;
+    remote.netif = SOCK_ADDR_ANY_NETIF;
     remote.port = msg->l4_destination_port;
 
     if ((res = sock_udp_send(&coap_vars.sock, msg->payload, msg->length, &remote)) >= 0) {

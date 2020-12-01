@@ -9,9 +9,14 @@
 */
 
 #include "config.h"
-#include "sock.h"
-#include "async.h"
+#include "opendefs.h"
+// #include "sock.h"
+// #include "async.h"
 
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async.h"
+#endif
+#include "net/sock/udp.h"
 //=========================== define ==========================================
 
 // IPv6 addresses of servers on the Internet
@@ -166,7 +171,7 @@ typedef struct {
     uint8_t commonIV[AES_CCM_16_64_128_IV_LEN];
     uint8_t idContext[OSCOAP_MAX_ID_LEN];
     uint8_t idContextLen;
-    // sender context 
+    // sender context
     uint8_t senderID[OSCOAP_MAX_ID_LEN];
     uint8_t senderIDLen;
     uint8_t senderKey[AES_CCM_16_64_128_KEY_LEN];

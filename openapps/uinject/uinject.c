@@ -4,8 +4,8 @@
 
 #include "opendefs.h"
 #include "uinject.h"
-#include "sock.h"
-#include "async.h"
+// #include "sock.h"
+// #include "async.h"
 #include "openserial.h"
 #include "packetfunctions.h"
 #include "scheduler.h"
@@ -14,6 +14,11 @@
 #include "icmpv6rpl.h"
 #include "idmanager.h"
 #include "openrandom.h"
+
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async.h"
+#endif
+#include "net/sock/udp.h"
 
 #include "msf.h"
 

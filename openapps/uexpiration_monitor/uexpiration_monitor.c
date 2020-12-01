@@ -4,14 +4,19 @@
 
 #include "opendefs.h"
 #include "uexpiration_monitor.h"
-#include "sock.h"
-#include "async.h"
+// #include "sock.h"
+// #include "async.h"
 #include "openserial.h"
 #include "packetfunctions.h"
 
 #ifdef DEADLINE_OPTION
 #include "iphc.h"
 #endif
+
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async.h"
+#endif
+#include "net/sock/udp.h"
 
 //=========================== variables =======================================
 

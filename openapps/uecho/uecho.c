@@ -4,11 +4,16 @@
 
 #include "opendefs.h"
 #include "uecho.h"
-#include "sock.h"
-#include "async.h"
+// #include "sock.h"
+// #include "async.h"
 #include "openqueue.h"
 #include "openserial.h"
 #include "packetfunctions.h"
+
+#ifdef SOCK_HAS_ASYNC
+#include "net/sock/async.h"
+#endif
+#include "net/sock/udp.h"
 
 //=========================== variables =======================================
 
