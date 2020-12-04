@@ -258,7 +258,7 @@ uint8_t coap_options_parse(uint8_t *buffer,
                            coap_option_iht *options,
                            uint8_t *optionsLen);
 
-uint8_t coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex);
+uint8_t openwsn_coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex);
 
 /**
 \}

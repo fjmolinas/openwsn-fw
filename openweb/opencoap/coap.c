@@ -191,7 +191,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
 
     // process handled options
     //== Stateless Proxy option
-    option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY,
+    option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY,
                                     &option_index);
     if (option_count >= 1) {
         statelessProxy = &coap_incomingOptions[option_index];
@@ -205,7 +205,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
     }
 
     //== Proxy Scheme option
-    option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME,
+    option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME,
                                     &option_index);
     if (option_count >= 1) {
         proxyScheme = &coap_incomingOptions[option_index];
@@ -220,7 +220,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
 
 
     //== Object Security Option
-    option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
+    option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
                                     &option_index);
     if (option_count >= 1) {
         objectSecurity = &coap_incomingOptions[option_index];
@@ -299,7 +299,7 @@ void coap_receive(OpenQueueEntry_t *msg) {
         // iterate until matching resource found, or no match
         while (found == FALSE && securityReturnCode == COAP_CODE_EMPTY) {
 
-            option_count = coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_URIPATH,
+            option_count = openwsn_coap_find_option(coap_incomingOptions, coap_incomingOptionsLen, COAP_OPTION_NUM_URIPATH,
                                             &option_index);
             if (
                     option_count == 2 &&
@@ -924,7 +924,7 @@ owerror_t coap_options_encode(
 }
 
 
-uint8_t coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex) {
+uint8_t openwsn_coap_find_option(coap_option_iht *array, uint8_t arrayLen, coap_option_t option, uint8_t *startIndex) {
     uint8_t i;
     uint8_t j;
     bool found;
@@ -1135,7 +1135,7 @@ void coap_handle_proxy_scheme(OpenQueueEntry_t *msg,
     open_addr_t JRCaddress;
 
     // verify that Proxy Scheme is set to coap
-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME, &option_index);
+    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_PROXYSCHEME, &option_index);
     if (option_count >= 1) {
         proxyScheme = &incomingOptions[option_index];
     } else {
@@ -1146,7 +1146,7 @@ void coap_handle_proxy_scheme(OpenQueueEntry_t *msg,
     }
 
     // verify that UriHost is set to "6tisch.arpa"
-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_URIHOST, &option_index);
+    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_URIHOST, &option_index);
     if (option_count >= 1) {
         uriHost = &incomingOptions[option_index];
     } else {
@@ -1202,7 +1202,7 @@ void coap_handle_stateless_proxy(OpenQueueEntry_t *msg,
     open_addr_t destIP;
     open_addr_t link_local_prefix;
 
-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY, &option_index);
+    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_STATELESSPROXY, &option_index);
     if (option_count >= 1) {
         statelessProxy = &incomingOptions[option_index];
     } else {

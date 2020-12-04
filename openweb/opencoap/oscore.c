@@ -11,7 +11,7 @@
 
 #define EAAD_MAX_LEN            9 + OSCOAP_MAX_ID_LEN // assumes no Class I options
 #define AAD_MAX_LEN            12 + EAAD_MAX_LEN
-#define INFO_MAX_LEN           2 * OSCOAP_MAX_ID_LEN + 2 + 1 + 4 + 1 + 3 
+#define INFO_MAX_LEN           2 * OSCOAP_MAX_ID_LEN + 2 + 1 + 4 + 1 + 3
 
 //=========================== variables =======================================
 
@@ -175,7 +175,7 @@ owerror_t oscore_protect_message(
     uint8_t option_index;
 
     // find object security option in the list of passed options
-    option_count = coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
+    option_count = openwsn_coap_find_option(incomingOptions, incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
                                     &option_index);
     if (option_count >= 1) {
         objectSecurity = &incomingOptions[option_index];
@@ -318,7 +318,7 @@ owerror_t oscore_unprotect_message(
     uint8_t option_index;
 
     // find object security option in the list of passed options
-    option_count = coap_find_option(incomingOptions, *incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
+    option_count = openwsn_coap_find_option(incomingOptions, *incomingOptionsLen, COAP_OPTION_NUM_OSCORE,
                                     &option_index);
     if (option_count >= 1) {
         objectSecurity = &incomingOptions[option_index];
