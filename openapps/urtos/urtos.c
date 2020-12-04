@@ -22,11 +22,13 @@
 //=========================== defines =========================================
 
 #define CPU_CYCLES_S                    (32000000UL / 3)
-#define UDP_PERIOD_MS                   (60 * 1000)
+#define UDP_PERIOD_MS                   (10 * 1000)
 #define FAST_PERIOD_MS                  (100)
 #define SLOW_PERIOD_MS                  (6 * 1000)
 #define FAST_EXEC_TIME_MS               (CPU_CYCLES_S / 100)
 #define SLOW_EXEC_TIME_MS               (CPU_CYCLES_S / 10)
+
+#define UDP_TRAFFIC_RATE 2
 
 //=========================== variables =======================================
 
@@ -35,6 +37,7 @@ typedef struct {
    uint32_t start;
    uint32_t max_delay;
    uint32_t cum_delay;
+   uint32_t counter;
 } task_stats_t;
 
 static task_stats_t _slow_stats;
@@ -59,8 +62,7 @@ void _fast_sensor_callback(void);
 void _slow_sensor_handler(opentimers_id_t id);
 void _fast_sensor_handler(opentimers_id_t id);
 void _udp_cb(opentimers_id_t id);
-int _send(uint32_t slow_max_delay, uint32_t slow_cum_delay,
-          uint32_t fast_max_delay, uint32_t fast_cum_delay);
+int _send(task_stats_t* slow_stats, task_stats_t* fast_stats);
 //=========================== public ==========================================
 
 void urtos_init(void) {
@@ -104,6 +106,7 @@ void _fast_sensor_callback(void) {
         _fast_stats.max_delay = delay;
     }
     _fast_stats.cum_delay += delay;
+    _fast_stats.counter++;
     /* busy loop */
     for (uint32_t i = 0; i < FAST_EXEC_TIME_MS; i++) {
         /* Make sure for loop is not optimized out */
@@ -118,6 +121,7 @@ void _slow_sensor_callback(void) {
         _slow_stats.max_delay = delay;
     }
     _slow_stats.cum_delay += delay;
+    _slow_stats.counter++;
     /* busy loop */
     for (uint32_t i = 0; i < SLOW_EXEC_TIME_MS; i++) {
         /* Make sure for loop is not optimized out */
@@ -126,11 +130,16 @@ void _slow_sensor_callback(void) {
 }
 
 void _udp_cb(opentimers_id_t id) {
-    _send(_slow_stats.max_delay, _slow_stats.cum_delay,
-          _fast_stats.max_delay, _fast_stats.cum_delay);
+    if (openrandom_get16b() < (0xffff / UDP_TRAFFIC_RATE)) {
+        _send(&_slow_stats, &_fast_stats);
+    }
     /* reset the cumulative delay */
     _slow_stats.cum_delay = 0;
     _fast_stats.cum_delay = 0;
+    _slow_stats.max_delay = 0;
+    _fast_stats.max_delay = 0;
+    _slow_stats.counter = 0;
+    _fast_stats.counter = 0;
 }
 
 void _slow_sensor_handler(opentimers_id_t id)
@@ -217,8 +226,7 @@ bool clear_to_send(void)
 }
 
 
-int _send(uint32_t slow_max_delay, uint32_t slow_cum_delay,
-          uint32_t fast_max_delay, uint32_t fast_cum_delay)
+int _send(task_stats_t* slow_stats, task_stats_t* fast_stats)
 {
     if (!clear_to_send()) {
         return -1;
@@ -243,14 +251,18 @@ int _send(uint32_t slow_max_delay, uint32_t slow_cum_delay,
     memcpy(&buffer[len], asn_array, sizeof(asn_array));
     len += sizeof(asn_array);
     /* add time data */
-    memcpy(&buffer[len], &slow_max_delay, sizeof(slow_max_delay));
-    len += sizeof(slow_max_delay);
-    memcpy(&buffer[len], &slow_cum_delay, sizeof(slow_cum_delay));
-    len += sizeof(slow_cum_delay);
-    memcpy(&buffer[len], &fast_max_delay, sizeof(fast_max_delay));
-    len += sizeof(fast_max_delay);
-    memcpy(&buffer[len], &fast_cum_delay, sizeof(fast_cum_delay));
-    len += sizeof(fast_cum_delay);
+    memcpy(&buffer[len], &slow_stats->cum_delay, sizeof(slow_stats->cum_delay));
+    len += sizeof(slow_stats->cum_delay);
+    memcpy(&buffer[len], &slow_stats->max_delay, sizeof(slow_stats->max_delay));
+    len += sizeof(slow_stats->max_delay);
+    memcpy(&buffer[len], &slow_stats->counter, sizeof(slow_stats->counter));
+    len += sizeof(slow_stats->counter);
+    memcpy(&buffer[len], &fast_stats->max_delay, sizeof(fast_stats->max_delay));
+    len += sizeof(fast_stats->max_delay);
+    memcpy(&buffer[len], &fast_stats->cum_delay, sizeof(fast_stats->cum_delay));
+    len += sizeof(fast_stats->cum_delay);
+    memcpy(&buffer[len], &fast_stats->counter, sizeof(fast_stats->counter));
+    len += sizeof(fast_stats->counter);
 
     if (sock_udp_send(&_sock_udp, buffer, len, &remote)) {
         _busy = true;
