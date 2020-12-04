@@ -216,6 +216,15 @@
 #define OPENWSN_COAP_C IS_USED(MODULE_OPENWSN_COAP)
 #endif
 
+/**
+ * \def OPENWSN_COAP_PORT_DEFAULT
+ *
+ * Defines the default port to use for COAP
+ *
+ */
+#ifndef OPENWSN_COAP_PORT_DEFAULT
+#define OPENWSN_COAP_PORT_DEFAULT   (5683)
+#endif
 
 // ========================== Stack modules ===========================
 
