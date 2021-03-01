@@ -210,7 +210,7 @@ void ieee154e_init(void) {
     opentimers_scheduleAbsolute(
             ieee154e_vars.timerId,          // timerId
             ieee154e_vars.slotDuration,     // duration
-            sctimer_readCounter(),          // reference
+            opentimers_getValue(),          // reference
             TIME_TICS,                      // timetype
             isr_ieee154e_newSlot            // callback
     );
@@ -596,7 +596,7 @@ port_INLINE void activity_synchronize_newSlot(void) {
         return;
     }
 
-    ieee154e_vars.radioOnInit = sctimer_readCounter();
+    ieee154e_vars.radioOnInit = opentimers_getValue();
     ieee154e_vars.radioOnThisSlot = TRUE;
 
     // if this is the first time I call this function while not synchronized,
@@ -836,7 +836,7 @@ port_INLINE void activity_synchronize_endOfFrame(PORT_TIMER_WIDTH capturedTime) 
         radio_rfOff();
 
         // compute radio duty cycle
-        ieee154e_vars.radioOnTics += (sctimer_readCounter() - ieee154e_vars.radioOnInit);
+        ieee154e_vars.radioOnTics += (opentimers_getValue() - ieee154e_vars.radioOnInit);
 
         // toss the IEs
         packetfunctions_tossHeader(&ieee154e_vars.dataReceived, lenIE);
@@ -1083,7 +1083,7 @@ port_INLINE void activity_ti1ORri1(void) {
                     endSlot();
                     return;
                 }
-                
+
                 // configure the radio to listen to the default synchronizing channel
                 radio_setFrequency(ieee154e_vars.freq, FREQ_TX);
 
@@ -1121,7 +1121,7 @@ port_INLINE void activity_ti1ORri1(void) {
             // 3.  set capture interrupt for Rx SFD done and receiving packet done
             sctimer_setCapture(ACTION_RX_SFD_DONE);
             sctimer_setCapture(ACTION_RX_DONE);
-        
+
             // configure the radio to listen to the default synchronizing channel
             radio_setFrequency(ieee154e_vars.freq, FREQ_RX);
 #else
@@ -1197,7 +1197,7 @@ port_INLINE void activity_ti2(void) {
     // enable the radio in Tx mode. This does not send the packet.
     radio_txEnable();
 
-    ieee154e_vars.radioOnInit = sctimer_readCounter();
+    ieee154e_vars.radioOnInit = opentimers_getValue();
     ieee154e_vars.radioOnThisSlot = TRUE;
     // change state
     changeState(S_TXDATAREADY);
@@ -1305,7 +1305,7 @@ port_INLINE void activity_ti5(PORT_TIMER_WIDTH capturedTime) {
 #endif
     // turn off the radio
     radio_rfOff();
-    ieee154e_vars.radioOnTics += (sctimer_readCounter() - ieee154e_vars.radioOnInit);
+    ieee154e_vars.radioOnTics += (opentimers_getValue() - ieee154e_vars.radioOnInit);
 
     // record the captured time
     ieee154e_vars.lastCapturedTime = capturedTime;
@@ -1377,7 +1377,7 @@ port_INLINE void activity_ti6(void) {
     radio_rxEnable();
 #endif
     //caputre init of radio for duty cycle calculation
-    ieee154e_vars.radioOnInit = sctimer_readCounter();
+    ieee154e_vars.radioOnInit = opentimers_getValue();
     ieee154e_vars.radioOnThisSlot = TRUE;
 
     // change state
@@ -1499,7 +1499,7 @@ port_INLINE void activity_ti9(PORT_TIMER_WIDTH capturedTime) {
     // turn off the radio
     radio_rfOff();
     //compute tics radio on.
-    ieee154e_vars.radioOnTics += (sctimer_readCounter() - ieee154e_vars.radioOnInit);
+    ieee154e_vars.radioOnTics += (opentimers_getValue() - ieee154e_vars.radioOnInit);
 
     // record the captured time
     ieee154e_vars.lastCapturedTime = capturedTime;
@@ -1637,7 +1637,7 @@ port_INLINE void activity_ri2(void) {
 
     radio_rxEnable();
 #endif
-    ieee154e_vars.radioOnInit = sctimer_readCounter();
+    ieee154e_vars.radioOnInit = opentimers_getValue();
     ieee154e_vars.radioOnThisSlot = TRUE;
 
     // change state
@@ -1749,7 +1749,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
 #endif
     // turn off the radio
     radio_rfOff();
-    ieee154e_vars.radioOnTics += sctimer_readCounter() - ieee154e_vars.radioOnInit;
+    ieee154e_vars.radioOnTics += opentimers_getValue() - ieee154e_vars.radioOnInit;
     // get a buffer to put the (received) data in
     ieee154e_vars.dataReceived = openqueue_getFreePacketBuffer(COMPONENT_IEEE802154E);
     if (ieee154e_vars.dataReceived == NULL) {
@@ -2067,7 +2067,7 @@ port_INLINE void activity_ri6(void) {
 #endif
     // enable the radio in Tx mode. This does not send that packet.
     radio_txEnable();
-    ieee154e_vars.radioOnInit = sctimer_readCounter();
+    ieee154e_vars.radioOnInit = opentimers_getValue();
     ieee154e_vars.radioOnThisSlot = TRUE;
     // change state
     changeState(S_TXACKREADY);
@@ -2828,7 +2828,7 @@ void endSlot(void) {
 
     // compute the duty cycle if radio has been turned on
     if (ieee154e_vars.radioOnThisSlot == TRUE) {
-        ieee154e_vars.radioOnTics += (sctimer_readCounter() - ieee154e_vars.radioOnInit);
+        ieee154e_vars.radioOnTics += (opentimers_getValue() - ieee154e_vars.radioOnInit);
     }
 #ifdef SLOT_FSM_IMPLEMENTATION_MULTIPLE_TIMER_INTERRUPT
     sctimer_actionCancel(ACTION_ALL_RADIOTIMER_INTERRUPT);
