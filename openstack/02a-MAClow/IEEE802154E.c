@@ -658,7 +658,7 @@ port_INLINE void activity_synchronize_newSlot(void) {
 
     // if I'm already in S_SYNCLISTEN, while not synchronized, but the synchronizing channel has been changed, change
     // the synchronizing channel
-    if ((ieee154e_vars.state == S_SYNCLISTEN) && (ieee154e_vars.singleChannelChanged == TRUE)) {
+    if ((ieee154e_vars.state == S_SYNCLISTEN)) {
         // turn off the radio (in case it wasn't yet)
         radio_rfOff();
 
@@ -676,7 +676,6 @@ port_INLINE void activity_synchronize_newSlot(void) {
         // switch on the radio in Rx mode.
         radio_rxEnable();
         radio_rxNow();
-        ieee154e_vars.singleChannelChanged = FALSE;
     }
 
     // increment dummy ASN to trigger debugprint every now and then
